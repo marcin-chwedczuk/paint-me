@@ -5,6 +5,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import pl.marcinchwedczuk.paintme.domain.Util;
 
@@ -22,7 +25,7 @@ public class MainWindow implements Initializable {
 
             window.setTitle("Main Window");
             window.setScene(scene);
-            window.setResizable(false);
+            window.setResizable(true);
 
             window.show();
 
@@ -33,15 +36,24 @@ public class MainWindow implements Initializable {
     }
 
     @FXML
-    private Label label;
+    private Rectangle horizontalResize;
+
+    @FXML
+    private Rectangle verticalResize;
+
+    @FXML
+    private Rectangle cornerResize;
+
+    @FXML
+    private ImageView canvas;
+
+    @FXML
+    private GridPane canvasPane;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        label.setText(Util.quote("Hello, world!"));
+        GridPane.setFillHeight(canvas, true);
+        GridPane.setFillWidth(canvas, true);
     }
 
-    @FXML
-    private void clicked() {
-        label.setText("Clicked!!!");
-    }
 }
