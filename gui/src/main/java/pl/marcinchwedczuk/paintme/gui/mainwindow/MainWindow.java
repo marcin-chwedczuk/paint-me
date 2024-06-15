@@ -52,8 +52,6 @@ public class MainWindow implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        GridPane.setFillHeight(canvas, true);
-        GridPane.setFillWidth(canvas, true);
     }
 
 }
