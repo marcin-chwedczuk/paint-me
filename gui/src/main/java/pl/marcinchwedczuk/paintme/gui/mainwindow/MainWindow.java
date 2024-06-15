@@ -35,6 +35,8 @@ public class MainWindow implements Initializable {
             window.setTitle("Main Window");
             window.setScene(scene);
             window.setResizable(true);
+            window.setWidth(480);
+            window.setHeight(400);
 
             window.show();
 
@@ -52,6 +54,9 @@ public class MainWindow implements Initializable {
 
     @FXML
     private Rectangle cornerResize;
+
+    @FXML
+    private Rectangle previewRectangle;
 
     @FXML
     private Pane canvas;
@@ -102,6 +107,9 @@ public class MainWindow implements Initializable {
             System.out.printf("setOnDragDetected x:%f, y:%f %n", lastPosition[0], lastPosition[1]);
 
             draging.set(true);
+            previewRectangle.setVisible(true);
+            previewRectangle.setWidth(lastSize[0]);
+            previewRectangle.setHeight(lastSize[1]);
             event.consume();
         });
 
@@ -115,8 +123,10 @@ public class MainWindow implements Initializable {
             double deltaY = event.getSceneY() - lastPosition[1];
 
             System.out.printf("deltaX: %f, deltaY: %f %n", deltaX, deltaY);
-            canvas.setPrefWidth(lastSize[0] + deltaX);
-            canvas.setPrefHeight(lastSize[1] + deltaY);
+            // canvas.setPrefWidth(lastSize[0] + deltaX);
+            // canvas.setPrefHeight(lastSize[1] + deltaY);
+            previewRectangle.setWidth(lastSize[0] + deltaX);
+            previewRectangle.setHeight(lastSize[1] + deltaY);
         });
 
 
@@ -130,8 +140,13 @@ public class MainWindow implements Initializable {
             double deltaY = event.getSceneY() - lastPosition[1];
 
             System.out.printf("deltaX: %f, deltaY: %f %n", deltaX, deltaY);
-            // canvas.setFitWidth(lastSize[0] + deltaX);
-            // canvas.setFitHeight(lastSize[1] + deltaY);
+
+            previewRectangle.setVisible(false);
+            previewRectangle.setWidth(0);
+            previewRectangle.setHeight(0);
+
+            canvas.setPrefWidth(lastSize[0] + deltaX);
+            canvas.setPrefHeight(lastSize[1] + deltaY);
         });
 
         System.out.println("Initailized");
