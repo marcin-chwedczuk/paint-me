@@ -29,6 +29,7 @@ public class MainWindow implements Initializable {
         try {
             FXMLLoader loader = new FXMLLoader(MainWindow.class.getResource("MainWindow.fxml"));
 
+            loader.setClassLoader(MainWindow.class.getClassLoader());
             Scene scene = new Scene(loader.load());
             MainWindow controller = (MainWindow) loader.getController();
 

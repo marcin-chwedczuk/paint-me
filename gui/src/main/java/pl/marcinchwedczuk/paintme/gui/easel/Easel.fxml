@@ -8,9 +8,10 @@
 <ScrollPane stylesheets="@Easel.css" styleClass="easel"
          fx:id="scrollPane" fitToHeight="true" fitToWidth="true" hvalue="1.0" maxHeight="1.7976931348623157E308"
          maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" vvalue="1.0"
+
          xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
 
-    <StackPane alignment="TOP_LEFT">
+    <StackPane alignment="TOP_LEFT"          style="-fx-background-color: darkgray;">
         <children>
             <GridPane fx:id="canvasPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
                       minWidth="-Infinity">
@@ -58,7 +59,7 @@
             </GridPane>
             <Rectangle fx:id="previewRectangle" arcHeight="5.0" arcWidth="5.0" fill="#ffffff00" height="100.0"
                        stroke="BLACK" strokeType="INSIDE" strokeWidth="4.0" width="100.0"
-                       StackPane.alignment="TOP_LEFT" mouseTransparent="true">
+                       StackPane.alignment="TOP_LEFT" mouseTransparent="true" visible="false">
                 <StackPane.margin>
                     <Insets left="16.0" top="16.0"/>
                 </StackPane.margin>
