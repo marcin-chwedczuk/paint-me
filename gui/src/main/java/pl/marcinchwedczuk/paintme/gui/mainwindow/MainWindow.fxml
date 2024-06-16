@@ -39,7 +39,9 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.canvas.Canvas?>
-<BorderPane prefHeight="449.0" prefWidth="519.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+<?import javafx.scene.layout.AnchorPane?>
+<BorderPane prefHeight="449.0" prefWidth="519.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="pl.marcinchwedczuk.paintme.gui.mainwindow.MainWindow">
    <left>
       <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
          <children>
@@ -48,7 +50,7 @@
                <children>
                   <ToolBar maxHeight="1.7976931348623157E308" orientation="VERTICAL" prefWidth="200.0">
                     <items>
-                        <ToggleButton mnemonicParsing="false" selected="true">
+                        <ToggleButton mnemonicParsing="false" selected="true" onAction="#buttonTest">
                             <graphic>
                                 <ImageView>
                                     <Image url="@pencil.png" />
@@ -126,11 +128,9 @@
    </bottom>
     <center>
         <Easel>
-            <BorderPane prefWidth="300" prefHeight="240" style="-fx-background-color: magenta;">
-                <center>
-                    <Canvas fx:id="drawingCanvas" />
-                </center>
-            </BorderPane>
+            <Pane fx:id="drawingCanvasContainer"  style="-fx-background-color: magenta; -fx-border-width: 0;">
+                <ImageView fx:id="drawingCanvas" mouseTransparent="true" />
+            </Pane>
         </Easel>
     </center>
 </BorderPane>
