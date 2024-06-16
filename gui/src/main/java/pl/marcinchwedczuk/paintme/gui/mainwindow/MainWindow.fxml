@@ -1,21 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.Cursor?>
-<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.layout.VBox?>
 
-<?import pl.marcinchwedczuk.paintme.gui.easel.EaselSkin?>
-<?import pl.marcinchwedczuk.paintme.gui.easel.Easel?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.layout.Background?>
-<?import javafx.scene.layout.BackgroundImage?>
+<!--
 <Easel>
     <Pane>
         <background>
@@ -31,3 +29,108 @@
         </background>
     </Pane>
 </Easel>
+-->
+
+
+<?import pl.marcinchwedczuk.paintme.gui.easel.Easel?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.Background?>
+<?import javafx.scene.layout.BackgroundImage?>
+<?import javafx.scene.image.Image?>
+<BorderPane prefHeight="449.0" prefWidth="519.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+   <left>
+      <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+         <children>
+            <Separator prefWidth="200.0" />
+            <HBox prefHeight="100.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+               <children>
+                  <ToolBar maxHeight="1.7976931348623157E308" orientation="VERTICAL" prefWidth="200.0">
+                    <items>
+                        <ToggleButton mnemonicParsing="false" selected="true" text="P" />
+                    </items>
+                  </ToolBar>
+                  <ToolBar maxHeight="1.7976931348623157E308" orientation="VERTICAL" prefWidth="200.0">
+                    <items>
+                        <ToggleButton mnemonicParsing="false" selected="true" text="P" />
+                    </items>
+                  </ToolBar>
+               </children>
+            </HBox>
+            <Separator prefWidth="200.0" />
+         </children>
+      </VBox>
+   </left>
+   <top>
+      <MenuBar BorderPane.alignment="CENTER">
+        <menus>
+          <Menu text="_File">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Close" />
+            </items>
+          </Menu>
+          <Menu text="_Edit">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Delete" />
+            </items>
+          </Menu>
+            <Menu text="_View">
+              <items>
+                <MenuItem mnemonicParsing="false" text="Action 1" />
+              </items>
+            </Menu>
+            <Menu text="_Image">
+              <items>
+                <MenuItem mnemonicParsing="false" text="Action 1" />
+              </items>
+            </Menu>
+            <Menu text="_Options">
+              <items>
+                <MenuItem mnemonicParsing="false" text="Action 1" />
+              </items>
+            </Menu>
+          <Menu text="_Help">
+            <items>
+              <MenuItem mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+   </top>
+   <bottom>
+      <GridPane BorderPane.alignment="CENTER">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <Separator GridPane.columnSpan="3" GridPane.rowIndex="2" />
+            <VBox prefHeight="200.0" prefWidth="100.0" GridPane.columnSpan="3" GridPane.rowIndex="1" />
+            <Separator prefWidth="200.0" GridPane.columnSpan="3" />
+         </children>
+      </GridPane>
+   </bottom>
+    <center>
+        <Easel>
+            <Pane>
+                <background>
+                    <Background>
+                        <images>
+                            <BackgroundImage repeatX="REPEAT" repeatY="REPEAT">
+                                <image>
+                                    <Image url="@sample.png" />
+                                </image>
+                            </BackgroundImage>
+                        </images>
+                    </Background>
+                </background>
+            </Pane>
+        </Easel>
+    </center>
+</BorderPane>
