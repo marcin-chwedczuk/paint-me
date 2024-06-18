@@ -24,7 +24,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.StackPane?>
 <BorderPane prefHeight="449.0" prefWidth="519.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="pl.marcinchwedczuk.paintme.gui.mainwindow.MainWindow">
+            fx:controller="pl.marcinchwedczuk.paintme.gui.mainwindow.MainWindow" stylesheets="@MainWindow.css">
    <left>
       <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
          <children>

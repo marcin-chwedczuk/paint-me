@@ -11,3 +11,10 @@
         -fx-text-fill: $example-variable;
     }
 }
+
+// Make text area transparent
+.text-area, .text-area .viewport, .text-area .content {
+    -fx-background-color: transparent ;
+}
+
+
