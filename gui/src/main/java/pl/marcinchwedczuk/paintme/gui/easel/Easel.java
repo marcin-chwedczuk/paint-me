@@ -5,6 +5,8 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.event.EventHandler;
+import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
@@ -21,6 +23,14 @@ public class Easel extends Control {
     @Override
     protected Skin<?> createDefaultSkin() {
         return new EaselSkin(this);
+    }
+
+    protected void fireZoomedEvent() {
+        fireEvent(new EaselZoomedEvent());
+    }
+
+    public void addCustomEventHandler(EventHandler<EaselZoomedEvent> handler) {
+        addEventHandler(EaselZoomedEvent.CUSTOM_EVENT_TYPE, handler);
     }
 
     public final ObjectProperty<Region> canvasProperty() {

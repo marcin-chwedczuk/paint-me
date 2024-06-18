@@ -7,6 +7,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.TextArea;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseButton;
@@ -62,18 +63,21 @@ public class MainWindow implements Initializable {
 
         // TODO: Important timeing, this must change only as the result of canvas container
         // change, not the zoom change
-        drawingCanvasContainer.widthProperty().addListener((o, oldW, newW) -> {
-            drawingCanvas.setWidth(newW.doubleValue() / easel.getZoom());
-            previewCanvas.setWidth(newW.doubleValue() / easel.getZoom());
-        });
-        drawingCanvasContainer.heightProperty().addListener((o, oldW, newW) -> {
-            drawingCanvas.setHeight(newW.doubleValue() / easel.getZoom());
-            previewCanvas.setHeight(newW.doubleValue() / easel.getZoom());
+        easel.addCustomEventHandler(e -> {
+            // TODO: Fix this shit
+            double newWidth = drawingCanvasContainer.getMaxWidth();
+            double newHeight = drawingCanvasContainer.getMaxHeight();
+
+            System.out.printf("New layout W: %f H: %f %n", newWidth, newHeight);
+
+            drawingCanvas.setWidth(newWidth / easel.getZoom());
+            previewCanvas.setWidth(newWidth / easel.getZoom());
+
+            drawingCanvas.setHeight(newHeight / easel.getZoom());
+            previewCanvas.setHeight(newHeight / easel.getZoom());
         });
 
         previewCanvas.setOnMouseMoved(e -> {
-            System.out.println("MouseMoved");
-
             clearPreview();
 
             GraphicsContext ctx = previewCanvas.getGraphicsContext2D();
@@ -115,5 +119,22 @@ public class MainWindow implements Initializable {
             drawingCanvas.getTransforms().clear();
             easel.setZoom(1);
         }
+    }
+
+    private Pane textPreviewContainer;
+    private TextArea textPreview;
+
+    @FXML
+    void textButton(ActionEvent event) {
+        textPreviewContainer = new Pane();
+
+        textPreview = new TextArea();
+        textPreview.setPrefWidth(300);
+        textPreview.setPrefHeight(120);
+        textPreviewContainer.getChildren().add(textPreview);
+
+        drawingCanvasContainer.getChildren().add(textPreviewContainer);
+
+        textPreview.setText("TEST");
     }
 }

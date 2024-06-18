@@ -87,8 +87,12 @@ public class EaselSkin extends SkinBase<Easel> {
         double[] lastSize = new double[] { canvas.getLayoutBounds().getWidth(), canvas.getLayoutBounds().getHeight() };
 
         getSkinnable().zoomProperty().addListener((observable, oldZoom, newZoom) -> {
-            canvas.setPrefWidth(canvas.getLayoutBounds().getWidth() / oldZoom.doubleValue() * newZoom.doubleValue());
-            canvas.setPrefHeight(canvas.getLayoutBounds().getHeight() / oldZoom.doubleValue() * newZoom.doubleValue());
+            double newW = canvas.getLayoutBounds().getWidth() / oldZoom.doubleValue() * newZoom.doubleValue();
+            double newH = canvas.getLayoutBounds().getHeight() / oldZoom.doubleValue() * newZoom.doubleValue();
+            canvas.setMinSize(newW, newH);
+            canvas.setMaxSize(newW, newH);
+
+            getSkinnable().fireZoomedEvent();
         });
 
         AtomicBoolean draging = new AtomicBoolean(false);
@@ -136,14 +140,20 @@ public class EaselSkin extends SkinBase<Easel> {
             double deltaX = event.getSceneX() - lastPosition[0];
             double deltaY = event.getSceneY() - lastPosition[1];
 
-            System.out.printf("deltaX: %f, deltaY: %f %n", deltaX, deltaY);
-
             previewRectangle.setVisible(false);
             previewRectangle.setWidth(0);
             previewRectangle.setHeight(0);
 
-            canvas.setPrefWidth(lastSize[0] * getSkinnable().getZoom() + deltaX);
-            canvas.setPrefHeight(lastSize[1] * getSkinnable().getZoom() + deltaY);
+            double newWidth = lastSize[0] * getSkinnable().getZoom() + deltaX;
+            double newHeight = lastSize[1] * getSkinnable().getZoom() + deltaY;
+
+            System.out.printf("New size W: %f H: %f %n", newWidth, newHeight);
+
+            canvas.setMaxSize(newWidth, newHeight);
+            canvas.setMinSize(newWidth, newHeight);
+
+            // TODO: Replace with better event e.g. canvas_size_changed
+            getSkinnable().fireZoomedEvent();
         });
 
         System.out.println("Initailized");

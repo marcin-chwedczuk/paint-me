@@ -44,6 +44,10 @@
                         <ToggleButton mnemonicParsing="false" selected="true" onAction="#zoomButton">
                             Z
                         </ToggleButton>
+
+                        <ToggleButton mnemonicParsing="false" selected="true" onAction="#textButton">
+                            T
+                        </ToggleButton>
                     </items>
                   </ToolBar>
                   <ToolBar maxHeight="1.7976931348623157E308" orientation="VERTICAL" prefWidth="200.0">
