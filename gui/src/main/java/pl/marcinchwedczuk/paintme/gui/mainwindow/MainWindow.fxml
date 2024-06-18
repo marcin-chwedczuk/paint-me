@@ -13,24 +13,6 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<!--
-<Easel>
-    <Pane>
-        <background>
-            <Background>
-                <images>
-                    <BackgroundImage repeatX="REPEAT" repeatY="REPEAT">
-                        <image>
-                            <Image url="@sample.png" />
-                        </image>
-                    </BackgroundImage>
-                </images>
-            </Background>
-        </background>
-    </Pane>
-</Easel>
--->
-
 
 <?import pl.marcinchwedczuk.paintme.gui.easel.Easel?>
 <?import javafx.scene.layout.Pane?>
@@ -40,6 +22,7 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.StackPane?>
 <BorderPane prefHeight="449.0" prefWidth="519.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="pl.marcinchwedczuk.paintme.gui.mainwindow.MainWindow">
    <left>
@@ -56,6 +39,10 @@
                                     <Image url="@pencil.png" />
                                 </ImageView>
                             </graphic>
+                        </ToggleButton>
+
+                        <ToggleButton mnemonicParsing="false" selected="true" onAction="#zoomButton">
+                            Z
                         </ToggleButton>
                     </items>
                   </ToolBar>
@@ -127,10 +114,11 @@
       </GridPane>
    </bottom>
     <center>
-        <Easel>
-            <Pane fx:id="drawingCanvasContainer"  style="-fx-background-color: magenta; -fx-border-width: 0;">
-                <ImageView fx:id="drawingCanvas" mouseTransparent="true" />
-            </Pane>
+        <Easel fx:id="easel">
+            <StackPane fx:id="drawingCanvasContainer" style="-fx-background-color: magenta; -fx-border-width: 0;">
+                <Canvas fx:id="drawingCanvas" StackPane.alignment="TOP_LEFT" mouseTransparent="true" viewOrder="10" />
+                <Canvas fx:id="previewCanvas" StackPane.alignment="TOP_LEFT" viewOrder="0" style="-fx-border-color: blue; -fx-border-width: 1;" />
+            </StackPane>
         </Easel>
     </center>
 </BorderPane>

@@ -1,5 +1,7 @@
 package pl.marcinchwedczuk.paintme.gui.easel;
 
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
@@ -82,7 +84,12 @@ public class EaselSkin extends SkinBase<Easel> {
     public void init() {
 
         double[] lastPosition = new double[] { 0, 0 };
-        double[] lastSize = new double[] { canvas.getPrefWidth(), canvas.getPrefHeight() };
+        double[] lastSize = new double[] { canvas.getLayoutBounds().getWidth(), canvas.getLayoutBounds().getHeight() };
+
+        getSkinnable().zoomProperty().addListener((observable, oldZoom, newZoom) -> {
+            canvas.setPrefWidth(canvas.getLayoutBounds().getWidth() / oldZoom.doubleValue() * newZoom.doubleValue());
+            canvas.setPrefHeight(canvas.getLayoutBounds().getHeight() / oldZoom.doubleValue() * newZoom.doubleValue());
+        });
 
         AtomicBoolean draging = new AtomicBoolean(false);
 
@@ -92,14 +99,14 @@ public class EaselSkin extends SkinBase<Easel> {
 
             lastPosition[0] = event.getSceneX();
             lastPosition[1] = event.getSceneY();
-            lastSize[0] = canvas.getPrefWidth();
-            lastSize[1] = canvas.getPrefHeight();
+            lastSize[0] = canvas.getLayoutBounds().getWidth() / getSkinnable().getZoom() ;
+            lastSize[1] = canvas.getLayoutBounds().getHeight() / getSkinnable().getZoom();
             System.out.printf("setOnDragDetected x:%f, y:%f %n", lastPosition[0], lastPosition[1]);
 
             draging.set(true);
             previewRectangle.setVisible(true);
-            previewRectangle.setWidth(lastSize[0]);
-            previewRectangle.setHeight(lastSize[1]);
+            previewRectangle.setWidth(lastSize[0] * getSkinnable().getZoom());
+            previewRectangle.setHeight(lastSize[1] * getSkinnable().getZoom());
             event.consume();
         });
 
@@ -115,8 +122,8 @@ public class EaselSkin extends SkinBase<Easel> {
             System.out.printf("deltaX: %f, deltaY: %f %n", deltaX, deltaY);
             // canvas.setPrefWidth(lastSize[0] + deltaX);
             // canvas.setPrefHeight(lastSize[1] + deltaY);
-            previewRectangle.setWidth(lastSize[0] + deltaX);
-            previewRectangle.setHeight(lastSize[1] + deltaY);
+            previewRectangle.setWidth(lastSize[0] * getSkinnable().getZoom() + deltaX);
+            previewRectangle.setHeight(lastSize[1] * getSkinnable().getZoom() + deltaY);
         });
 
 
@@ -135,8 +142,8 @@ public class EaselSkin extends SkinBase<Easel> {
             previewRectangle.setWidth(0);
             previewRectangle.setHeight(0);
 
-            canvas.setPrefWidth(lastSize[0] + deltaX);
-            canvas.setPrefHeight(lastSize[1] + deltaY);
+            canvas.setPrefWidth(lastSize[0] * getSkinnable().getZoom() + deltaX);
+            canvas.setPrefHeight(lastSize[1] * getSkinnable().getZoom() + deltaY);
         });
 
         System.out.println("Initailized");

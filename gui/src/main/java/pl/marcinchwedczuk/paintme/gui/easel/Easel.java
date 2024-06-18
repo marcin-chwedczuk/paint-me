@@ -1,7 +1,9 @@
 package pl.marcinchwedczuk.paintme.gui.easel;
 
 import javafx.beans.DefaultProperty;
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
 import javafx.scene.control.Control;
@@ -12,6 +14,9 @@ import javafx.scene.layout.Region;
 public class Easel extends Control {
     private final ObjectProperty<Region> canvasProperty =
             new SimpleObjectProperty<>(this, "canvas", null);
+
+    private final DoubleProperty zoomProperty =
+            new SimpleDoubleProperty(this, "zoom", 1.0);
 
     @Override
     protected Skin<?> createDefaultSkin() {
@@ -28,5 +33,17 @@ public class Easel extends Control {
 
     public final Region getCanvas() {
         return canvasProperty().get();
+    }
+
+    public DoubleProperty zoomProperty() {
+        return zoomProperty;
+    }
+
+    public double getZoom() {
+        return zoomProperty().get();
+    }
+
+    public void setZoom(double zoom) {
+        zoomProperty().set(zoom);
     }
 }

@@ -5,13 +5,16 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.transform.Scale;
 import javafx.stage.Stage;
+import pl.marcinchwedczuk.paintme.gui.easel.Easel;
 
 import java.io.IOException;
 import java.net.URL;
@@ -42,49 +45,75 @@ public class MainWindow implements Initializable {
     }
 
     @FXML
-    private ImageView drawingCanvas;
-    @FXML
-    private Pane drawingCanvasContainer;
+    private Canvas drawingCanvas;
 
-    private WritableImage image;
+    @FXML
+    private Canvas previewCanvas;
+
+    @FXML
+    private StackPane drawingCanvasContainer;
+
+    @FXML
+    private Easel easel;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         System.out.println("Initialized");
 
-        drawingCanvasContainer.widthProperty().addListener((o, oldValue, newValue) -> {
-            resizeDrawingCanvas();
+        // TODO: Important timeing, this must change only as the result of canvas container
+        // change, not the zoom change
+        drawingCanvasContainer.widthProperty().addListener((o, oldW, newW) -> {
+            drawingCanvas.setWidth(newW.doubleValue() / easel.getZoom());
+            previewCanvas.setWidth(newW.doubleValue() / easel.getZoom());
         });
-        drawingCanvasContainer.heightProperty().addListener((o, oldValue, newValue) -> {
-            resizeDrawingCanvas();
-        });
-
-        drawingCanvasContainer.setOnMouseClicked(e -> {
-            drawRandom(e.getX(), e.getY());
-        });
-
-        drawingCanvasContainer.setOnMouseMoved(e -> {
-            //if (e.getButton() == MouseButton.PRIMARY) {
-                drawRandom(e.getX(), e.getY());
-            //}
+        drawingCanvasContainer.heightProperty().addListener((o, oldW, newW) -> {
+            drawingCanvas.setHeight(newW.doubleValue() / easel.getZoom());
+            previewCanvas.setHeight(newW.doubleValue() / easel.getZoom());
         });
 
-        resizeDrawingCanvas();
+        previewCanvas.setOnMouseMoved(e -> {
+            System.out.println("MouseMoved");
+
+            clearPreview();
+
+            GraphicsContext ctx = previewCanvas.getGraphicsContext2D();
+            ctx.setFill(Color.BLACK);
+            ctx.fillOval(e.getX() - 5, e.getY() - 5, 10, 10);
+        });
+
+        previewCanvas.setOnMouseExited(e -> {
+            clearPreview();
+        });
+
+        previewCanvas.setOnMouseClicked(e -> {
+            clearPreview();
+
+            GraphicsContext ctx = drawingCanvas.getGraphicsContext2D();
+            ctx.setFill(Color.BLACK);
+            ctx.fillOval(e.getX() - 5, e.getY() - 5, 10, 10);
+        });
+    }
+
+    private void clearPreview() {
+        GraphicsContext ctx = previewCanvas.getGraphicsContext2D();
+        ctx.clearRect(0, 0, previewCanvas.getWidth(), previewCanvas.getHeight());
     }
 
     @FXML
     void buttonTest(ActionEvent event) {
     }
 
-    private void resizeDrawingCanvas() {
-        double w = Math.max(1, drawingCanvasContainer.getWidth());
-        double h = Math.max(1, drawingCanvasContainer.getHeight());
 
-        image = new WritableImage((int)w, (int)h);
-        drawingCanvas.setImage(image);
-    }
-
-    private void drawRandom(double x, double y) {
-        image.getPixelWriter().setColor((int)x, (int)y, Color.BLACK);
+    @FXML
+    void zoomButton(ActionEvent event) {
+        if (previewCanvas.getTransforms().isEmpty()) {
+            previewCanvas.getTransforms().add(new Scale(4, 4, 0, 0));
+            drawingCanvas.getTransforms().add(new Scale(4, 4, 0, 0));
+            easel.setZoom(4);
+        } else {
+            previewCanvas.getTransforms().clear();
+            drawingCanvas.getTransforms().clear();
+            easel.setZoom(1);
+        }
     }
 }
