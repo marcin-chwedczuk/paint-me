@@ -167,6 +167,9 @@
                         <!-- Enable assertions -->
                         <option>-ea</option>
 
+                        <option>--add-opens</option>
+                        <option>javafx.controls/javafx.scene.control.skin=pl.marcinchwedczuk.paintme.gui</option>
+
                         <!-- uncomment to enable debugger's "Attach to Process..." -->
                         <!--
                         <option>-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=4444</option>

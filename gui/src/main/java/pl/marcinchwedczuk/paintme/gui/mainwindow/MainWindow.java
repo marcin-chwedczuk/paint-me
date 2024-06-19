@@ -6,7 +6,9 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.geometry.VPos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
@@ -14,6 +16,8 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Control;
 import javafx.scene.control.Skin;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextFormatter;
+import javafx.scene.control.skin.TextAreaSkin;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
@@ -21,12 +25,17 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import javafx.scene.text.FontSmoothingType;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextBoundsType;
 import javafx.scene.transform.Scale;
 import javafx.stage.Stage;
 import pl.marcinchwedczuk.paintme.gui.easel.Easel;
 
 import javax.swing.*;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Random;
 import java.util.ResourceBundle;
@@ -132,17 +141,65 @@ public class MainWindow implements Initializable {
     }
 
     private TextArea textPreview;
+    private Text helper = new Text();
 
     @FXML
     void textButton(ActionEvent event) {
-
         textPreview = new TextArea();
         textPreview.setBorder(Border.EMPTY);
-        textPreview.setPrefWidth(300);
-        textPreview.setPrefHeight(120);
-        textPreview.setStyle("-fx-text-fill: rgb(255,255,0);");
+        textPreview.setPrefColumnCount(20);
+        textPreview.setPrefRowCount(2);
+        textPreview.setWrapText(true);
+        textPreview.setStyle(
+                "-fx-padding: 0; " +
+                        "-fx-background-insets: 0; " +
+                        "-fx-border-insets: 0;"
+        );
 
-        drawingCanvasContainer.getChildren().add(textPreview);
+        StackPane.setAlignment(helper, Pos.TOP_LEFT);
+
+        var customSkin = new TextAreaSkin(textPreview) {
+            public Text getTextNode() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+                Method method = TextAreaSkin.class.getDeclaredMethod("getTextNode");
+                // Allow access to the method (make it accessible)
+                method.setAccessible(true);
+                // Invoke the method
+                return (Text) method.invoke(this);
+            }
+        };
+
+        textPreview.setSkin(customSkin);
+
+        textPreview.setTextFormatter(new TextFormatter<String>(change -> {
+            if (change.isAdded() || change.isReplaced() || change.isContentChange()) {
+                helper.setFont(textPreview.getFont());
+                helper.setText(change.getControlNewText());
+                helper.setWrappingWidth(textPreview.getLayoutBounds().getWidth());
+                helper.setTextOrigin(VPos.TOP);
+                helper.setFontSmoothingType(FontSmoothingType.LCD);
+                helper.setBoundsType(TextBoundsType.LOGICAL_VERTICAL_CENTER);
+
+                try {
+                System.out.println("TEXT NODE: " + customSkin.getTextNode());
+                System.out.println("TEXT NODE: " + helper);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+
+                double w = helper.getLayoutBounds().getWidth();
+                double h = helper.getLayoutBounds().getHeight();
+
+                if (w > textPreview.getLayoutBounds().getWidth() || h > textPreview.getLayoutBounds().getHeight()) {
+                    System.out.printf("Stop change %n");
+                    return null;
+                }
+            }
+
+            return change;
+        }));
+
+        drawingCanvasContainer.getChildren().addAll(helper, textPreview);
 
         textPreview.setText("TEST");
 
