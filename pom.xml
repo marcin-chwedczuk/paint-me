@@ -84,6 +84,11 @@
                 <artifactId>javafx-base</artifactId>
                 <version>${javafx.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-swing</artifactId>
+                <version>${javafx.version}</version>
+            </dependency>
 
             <!-- Test dependencies -->
             <dependency>
@@ -120,12 +125,6 @@
                 <groupId>org.testfx</groupId>
                 <artifactId>openjfx-monocle</artifactId>
                 <version>${openjfx-monocle.version}</version>
-            </dependency>
-            <dependency>
-                <!-- Needed for screenshot in TestFX -->
-                <groupId>org.openjfx</groupId>
-                <artifactId>javafx-swing</artifactId>
-                <version>${javafx.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -172,6 +171,17 @@
         </pluginManagement>
 
         <plugins>
+            <!-- Compile -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <compilerArgs>
+                        <arg>--add-exports</arg><arg>javafx.graphics/com.sun.javafx.sg.prism=pl.marcinchwedczuk.paintme.gui</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+
             <!-- Runs unit tests -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

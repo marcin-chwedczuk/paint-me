@@ -4,6 +4,7 @@ module pl.marcinchwedczuk.paintme.gui {
     requires javafx.controls;
     requires javafx.fxml;
     requires java.desktop;
+    requires javafx.swing;
 
     exports pl.marcinchwedczuk.paintme.gui;
     exports pl.marcinchwedczuk.paintme.gui.easel;

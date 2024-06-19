@@ -2,6 +2,7 @@ package pl.marcinchwedczuk.paintme.gui.mainwindow;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -32,7 +33,9 @@ import javafx.scene.transform.Scale;
 import javafx.stage.Stage;
 import pl.marcinchwedczuk.paintme.gui.easel.Easel;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -206,16 +209,29 @@ public class MainWindow implements Initializable {
         textPreview.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.ENTER && e.isControlDown()) {
                 drawingCanvasContainer.getChildren().remove(textPreview);
+                drawingCanvasContainer.getChildren().remove(helper);
 
                 // Draw text on canvas
                 var params = new SnapshotParameters();
-                params.setFill(Color.TRANSPARENT);
-                WritableImage textImg = textPreview.snapshot(params, null);
+                params.setFill(Color.WHITE);
+                params.setTransform(new Scale(3, 3));
+                WritableImage textImg = helper.snapshot(params, null);
+
+
+                // var tmp = new com.sun.javafx.sg.prism.NGText();
+
 
                 GraphicsContext c2d = drawingCanvas.getGraphicsContext2D();
                 // Low quality shit:
-                // c2d.drawImage(textImg, 0, 0);
+                // c2d.setImageSmoothing(false);
+                c2d.drawImage(textImg, 0, 0, textImg.getWidth() / 3, textImg.getHeight() / 3);
 
+                try {
+                    ImageIO.write(SwingFXUtils.fromFXImage(textImg, null),
+                            "png", new File("/Users/mc/dev/paint-me/dump.png"));
+                } catch (Exception ex) { ex.printStackTrace(); }
+
+                /*
                 c2d.setFill(Color.YELLOWGREEN);
                 c2d.fillRect(0, 0, 5, 5);
                 c2d.fillRect(20, 20, 5, 5);
@@ -224,6 +240,7 @@ public class MainWindow implements Initializable {
                 c2d.setFont(textPreview.getFont());
                 c2d.setTextBaseline(VPos.TOP);
                 c2d.fillText(textPreview.getText(), 1, 1);
+                 */
             }
         });
     }
