@@ -31,6 +31,8 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextBoundsType;
 import javafx.scene.transform.Scale;
 import javafx.stage.Stage;
+import javafx.stage.Window;
+import pl.marcinchwedczuk.paintme.gui.colorpicker.ColorPicker;
 import pl.marcinchwedczuk.paintme.gui.easel.Easel;
 
 import javax.imageio.ImageIO;
@@ -243,5 +245,11 @@ public class MainWindow implements Initializable {
                  */
             }
         });
+    }
+
+    @FXML
+    void colorButton() {
+        Window window = drawingCanvas.getScene().getWindow();
+        ColorPicker.showModal(window);
     }
 }
