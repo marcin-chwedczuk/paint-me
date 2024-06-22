@@ -9,15 +9,15 @@ import static java.lang.Math.min;
  * HSL <-> RGB color translation.
  * Based on Wine: https://source.winehq.org/source/dlls/shlwapi/ordinal.c
  */
-public class HSL {
+public class HslColor {
     public static int MIN_VALUE = 0;
     public static int MAX_VALUE = 240;
 
-    public static HSL fromHSL(int hue, int luminance, int saturation) {
-        return new HSL(hue, luminance, saturation);
+    public static HslColor ofHsl(int hue, int luminance, int saturation) {
+        return new HslColor(hue, luminance, saturation);
     }
 
-    public static HSL fromRGB(int wR, int wG, int wB) {
+    public static HslColor ofRgb(int wR, int wG, int wB) {
         int wMax, wMin;
         int wHue, wLuminosity, wSaturation;
 
@@ -60,14 +60,14 @@ public class HSL {
                 wHue -= 240;
         }
 
-        return new HSL(wHue, wLuminosity, wSaturation);
+        return new HslColor(wHue, wLuminosity, wSaturation);
     }
 
     private final int hue;
     private final int luminance;
     private final int saturation;
 
-    public HSL(int hue, int luminance, int saturation) {
+    public HslColor(int hue, int luminance, int saturation) {
         // TODO Validate ranges
         // In the Color dialog box, the saturation and luminosity values must be in the range 0 through 240, and the hue value must be in the range 0 through 239.
         // https://learn.microsoft.com/pl-pl/windows/win32/dlgbox/color-dialog-box?redirectedfrom=MSDN
@@ -105,7 +105,7 @@ public class HSL {
         return (convertHue(h, mid1, mid2) * 255 + 120) / 240;
     }
 
-    public Color toRgb() {
+    public Color toColor() {
         int wRed;
 
         if (saturation != 0) {

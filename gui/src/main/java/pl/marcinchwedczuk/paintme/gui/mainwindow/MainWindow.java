@@ -1,7 +1,5 @@
 package pl.marcinchwedczuk.paintme.gui.mainwindow;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -9,40 +7,32 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Control;
-import javafx.scene.control.Skin;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.control.skin.TextAreaSkin;
-import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.text.FontSmoothingType;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextBoundsType;
 import javafx.scene.transform.Scale;
 import javafx.stage.Stage;
 import javafx.stage.Window;
-import pl.marcinchwedczuk.paintme.gui.colorpicker.ColorPicker;
+import pl.marcinchwedczuk.paintme.gui.colorpicker.ColorDialog;
 import pl.marcinchwedczuk.paintme.gui.easel.Easel;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.util.Random;
 import java.util.ResourceBundle;
 
 public class MainWindow implements Initializable {
@@ -250,6 +240,6 @@ public class MainWindow implements Initializable {
     @FXML
     void colorButton() {
         Window window = drawingCanvas.getScene().getWindow();
-        ColorPicker.showModal(window);
+        ColorDialog.showModal(window);
     }
 }

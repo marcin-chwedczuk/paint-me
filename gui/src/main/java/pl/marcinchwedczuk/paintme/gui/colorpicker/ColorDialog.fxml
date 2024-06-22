@@ -8,12 +8,13 @@
 
 <?import javafx.scene.text.Text?>
 <?import javafx.scene.canvas.Canvas?>
+<?import pl.marcinchwedczuk.paintme.gui.colorpicker.ColorPicker?>
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="pl.marcinchwedczuk.paintme.gui.colorpicker.ColorPicker"
+            fx:controller="pl.marcinchwedczuk.paintme.gui.colorpicker.ColorDialog"
             prefHeight="400.0" prefWidth="600.0">
     <Pane>
-        <Canvas width="240" height="240" fx:id="colors" />
+        <ColorPicker />
         <AnchorPane.topAnchor>10</AnchorPane.topAnchor>
         <AnchorPane.leftAnchor>10</AnchorPane.leftAnchor>
     </Pane>
