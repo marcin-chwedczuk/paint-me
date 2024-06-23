@@ -13,7 +13,7 @@ public class HslColor {
     public static int MIN_VALUE = 0;
     public static int MAX_VALUE = 240;
 
-    public static HslColor ofHsl(int hue, int luminance, int saturation) {
+    public static HslColor ofHsl(int hue, int saturation, int luminance) {
         return new HslColor(hue, luminance, saturation);
     }
 
@@ -76,16 +76,28 @@ public class HslColor {
         this.saturation = saturation;
     }
 
-    public int getHue() {
+    public int hue() {
         return hue;
     }
 
-    public int getLuminance() {
+    public HslColor withHue(int newHue) {
+        return HslColor.ofHsl(newHue, saturation, luminance);
+    }
+
+    public int luminance() {
         return luminance;
     }
 
-    public int getSaturation() {
+    public HslColor withLuminance(int newLuminance) {
+        return HslColor.ofHsl(hue, saturation, newLuminance);
+    }
+
+    public int saturation() {
         return saturation;
+    }
+
+    public HslColor withSaturation(int newSaturation) {
+        return HslColor.ofHsl(hue, newSaturation, luminance);
     }
 
     private static int convertHue(int wHue, int wMid1, int wMid2) {

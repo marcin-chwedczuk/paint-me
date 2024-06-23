@@ -21,6 +21,9 @@ public class App extends Application {
     }
 
     public static void main(String[] args) {
+        // TODO: Blurry text on Linux - try to fix this....
+        // System.setProperty("prism.lcdtext", "true");
+
         URL.setURLStreamHandlerFactory(new URLStreamHandlerFactory() {
             @Override
             public URLStreamHandler createURLStreamHandler(String protocol) {
