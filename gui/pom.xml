@@ -46,6 +46,11 @@
             <artifactId>javafx-swing</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+        </dependency>
+
         <!-- Test dependencies -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -168,6 +173,10 @@
 
                         <option>--add-opens</option>
                         <option>javafx.controls/javafx.scene.control.skin=pl.marcinchwedczuk.paintme.gui</option>
+                        <option>--add-opens</option>
+                        <option>javafx.controls/javafx.scene.control=pl.marcinchwedczuk.paintme.gui</option>
+                        <option>--add-exports</option>
+                        <option>javafx.controls/javafx.scene.control=pl.marcinchwedczuk.paintme.gui</option>
                         <option>--add-exports</option>
                         <option>javafx.graphics/com.sun.javafx.sg.prism=pl.marcinchwedczuk.paintme.gui</option>
                         <!-- uncomment to enable debugger's "Attach to Process..." -->

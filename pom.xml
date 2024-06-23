@@ -90,6 +90,12 @@
                 <version>${javafx.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.reflections</groupId>
+                <artifactId>reflections</artifactId>
+                <version>0.10.2</version>
+            </dependency>
+
             <!-- Test dependencies -->
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
@@ -178,6 +184,7 @@
                 <configuration>
                     <compilerArgs>
                         <arg>--add-exports</arg><arg>javafx.graphics/com.sun.javafx.sg.prism=pl.marcinchwedczuk.paintme.gui</arg>
+                        <arg>--add-opens</arg><arg>javafx.controls/javafx.scene.control=pl.marcinchwedczuk.paintme.gui</arg>
                     </compilerArgs>
                 </configuration>
             </plugin>

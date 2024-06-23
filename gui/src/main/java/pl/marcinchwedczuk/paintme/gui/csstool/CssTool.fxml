@@ -1,0 +1,25 @@
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<SplitPane prefHeight="449.0" prefWidth="519.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.marcinchwedczuk.paintme.gui.csstool.CssTool">
+    <SplitPane orientation="VERTICAL">
+        <TextArea fx:id="cssText">abc</TextArea>
+        <TextArea fx:id="warnings" editable="false">abc</TextArea>
+    </SplitPane>
+    <SplitPane orientation="VERTICAL">
+        <VBox>
+            <HBox>
+                <Label>Control:</Label>
+                <ComboBox fx:id="selectedControl"  />
+            </HBox>
+            <BorderPane fx:id="controlContainer" />
+        </VBox>
+        <TextArea fx:id="helpText" editable="false" />
+    </SplitPane>
+</SplitPane>

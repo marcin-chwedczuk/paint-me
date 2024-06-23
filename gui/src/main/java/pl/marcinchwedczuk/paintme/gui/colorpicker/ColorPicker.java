@@ -6,6 +6,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.RadioButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
@@ -25,6 +26,10 @@ public class ColorPicker extends HBox {
     private final Polygon triangleLuminancePointer;
 
     public ColorPicker() {
+        String css = getClass().getResource("ColorPicker.css").toExternalForm();
+        System.out.println("CSS: " + css);
+        getStylesheets().add(css);
+
         hueSaturationArea = new Canvas();
         hueSaturationArea.setWidth(239);
         hueSaturationArea.setHeight(240);
@@ -61,7 +66,19 @@ public class ColorPicker extends HBox {
         luminanceBar.setHeight(240);
 
         triangleLuminancePointer = new Polygon(0, 0, 1, 1, 1, -1);
-        getChildren().addAll(hueSaturationAreaPane, luminanceBar, triangleLuminancePointer);
+
+
+        var rb =  new RadioButton();
+        rb.getStyleClass().add("color-radio");
+
+        var rb2 =  new RadioButton();
+        rb2.getStyleClass().add("color-radio");
+
+        var tmp = new HBox(
+               rb, rb2
+        );
+
+        getChildren().addAll(tmp, hueSaturationAreaPane, luminanceBar, triangleLuminancePointer);
 
         redrawHueSaturationArea(120, 120);
         redrawLuminanceBar();

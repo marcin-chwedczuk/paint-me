@@ -20,7 +20,15 @@ public class FxCssURLConnection extends URLConnection {
     @Override
     public void connect() throws IOException {
         System.out.println("Got URL: " + getURL());
-        cssStylesheet = ".foo { -x-bar: red; }";
+        String className = getURL().getHost();
+
+        try {
+            Object o = Class.forName(className).newInstance();
+            cssStylesheet = ((DynamicCssProvider)o).loadCss();
+        } catch (Exception e) {
+            e.printStackTrace();
+            cssStylesheet = "/* invalid */";
+        }
     }
 
     @Override

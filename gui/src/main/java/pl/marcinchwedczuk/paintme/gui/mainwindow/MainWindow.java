@@ -22,9 +22,11 @@ import javafx.scene.text.FontSmoothingType;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextBoundsType;
 import javafx.scene.transform.Scale;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import pl.marcinchwedczuk.paintme.gui.colorpicker.ColorDialog;
+import pl.marcinchwedczuk.paintme.gui.csstool.CssTool;
 import pl.marcinchwedczuk.paintme.gui.easel.Easel;
 
 import javax.imageio.ImageIO;
@@ -241,5 +243,12 @@ public class MainWindow implements Initializable {
     void colorButton() {
         Window window = drawingCanvas.getScene().getWindow();
         ColorDialog.showModal(window);
+    }
+
+    public void showCssTool(ActionEvent event) {
+        Stage secondStage = new Stage();
+        secondStage.initModality(Modality.NONE);
+
+        CssTool.showOn(secondStage);
     }
 }

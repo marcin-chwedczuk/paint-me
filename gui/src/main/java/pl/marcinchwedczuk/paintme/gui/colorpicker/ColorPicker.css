@@ -1,0 +1,11 @@
+.color-radio > .radio {
+    -fx-background-radius: 0;
+}
+
+.color-radio > .radio > .dot {
+    -fx-background-radius: 0;
+}
+
+.color-radio:selected > .radio > .dot {
+
+}
