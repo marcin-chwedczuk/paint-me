@@ -11,6 +11,8 @@ import javafx.scene.shape.Polygon;
 import javafx.scene.transform.Scale;
 import pl.marcinchwedczuk.paintme.gui.extra.BeveledPane;
 
+import javax.print.DocFlavor;
+import java.net.URL;
 import java.util.Random;
 
 public class ColorPicker extends HBox {
@@ -24,6 +26,10 @@ public class ColorPicker extends HBox {
         hueSaturationArea.setWidth(239);
         hueSaturationArea.setHeight(240);
 
+        try {
+            new URL("fxcss://foo.bar").openStream();
+        } catch (Exception e) { e.printStackTrace(); }
+
         hueSaturationArea.setOnMouseClicked(e -> {
             var r = new Random();
             hueSaturationArea.setWidth(140 + r.nextInt(100));
@@ -34,20 +40,11 @@ public class ColorPicker extends HBox {
             xxx.fillRect(0, 0, hueSaturationArea.getWidth(), hueSaturationArea.getHeight());
         });
 
+
+        // TODO: Consider using special coursor for Canvas (for the sniper mark)
+        // COURSOR <<<<<
         var hueSaturationAreaPane = new BeveledPane(hueSaturationArea);
 
-        // Define the colors for the border
-        Color lightGray = Color.rgb(192, 192, 192);
-        Color darkGray = Color.rgb(128, 128, 128);
-        Color white = Color.rgb(255, 255, 255);
-        Color black = Color.rgb(0, 0, 0);
-
-        // Create a Border with different colors for each side to mimic the 3D effect
-        Border border = new Border(new BorderStroke(
-                black, darkGray, white, lightGray,
-                BorderStrokeStyle.SOLID, BorderStrokeStyle.SOLID, BorderStrokeStyle.SOLID, BorderStrokeStyle.SOLID,
-                CornerRadii.EMPTY, new BorderWidths(3), new Insets(20, 30, 20, 30)
-        ));
         // hueSaturationAreaPane.setBorder(border);
 
         luminanceBar = new Canvas();

@@ -11,6 +11,7 @@ module pl.marcinchwedczuk.paintme.gui {
     exports pl.marcinchwedczuk.paintme.gui.mainwindow;
     exports pl.marcinchwedczuk.paintme.gui.colorpicker;
     exports pl.marcinchwedczuk.paintme.gui.extra;
+    exports pl.marcinchwedczuk.paintme.gui.dynamiccss;
     exports icons;
 
     // Allow @FXML injection to private fields.
@@ -18,5 +19,6 @@ module pl.marcinchwedczuk.paintme.gui {
     opens pl.marcinchwedczuk.paintme.gui.colorpicker;
     opens pl.marcinchwedczuk.paintme.gui.easel;
     opens pl.marcinchwedczuk.paintme.gui.extra;
+    opens pl.marcinchwedczuk.paintme.gui.dynamiccss;
     opens icons;
 }
