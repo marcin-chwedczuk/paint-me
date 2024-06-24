@@ -21,6 +21,7 @@ import javafx.scene.layout.BackgroundPosition;
 import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.BorderWidths;
+import javafx.scene.text.Text;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 
@@ -77,7 +78,9 @@ public class CssTool implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         System.out.println("INITIALIZING CSS TOOL");
 
+        autocompleteList.setFocusTraversable(false);
         autocomplete.getContent().add(autocompleteList);
+        autocomplete.setHideOnEscape(true);
 
         List<String> controls = List.of(
                 RadioButton.class.getName(),
@@ -151,6 +154,32 @@ public class CssTool implements Initializable {
         cssText.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ESCAPE) {
                 autocomplete.hide();
+                event.consume();
+            }
+
+            if (autocomplete.isShowing()) {
+                int selected = autocompleteList.getSelectionModel().getSelectedIndex();
+                if (autocompleteList.getItems().isEmpty()) return;
+
+                if (event.getCode() == KeyCode.UP) {
+                    if (selected == -1) {
+                        autocompleteList.getSelectionModel().select(0);
+                    } else {
+                        autocompleteList.getSelectionModel().select(Math.max(0, autocompleteList.getSelectionModel().getSelectedIndex() - 1));
+                    }
+                } else if (event.getCode() == KeyCode.DOWN) {
+                    if (selected == -1) {
+                        autocompleteList.getSelectionModel().select(0);
+                    } else {
+                        autocompleteList.getSelectionModel().select(Math.min(autocompleteList.getItems().size()-1, autocompleteList.getSelectionModel().getSelectedIndex() + 1));
+                    }
+                } else if (event.getCode() == KeyCode.TAB) {
+                    autocomplete.hide();
+                    if (selected != -1) {
+                        String autocompletedText = autocompleteList.getSelectionModel().getSelectedItem();
+                        cssText.insertText(cssText.getCaretPosition(), "AUTO:" + autocompletedText);
+                    }
+                }
             }
         });
 
@@ -170,26 +199,26 @@ public class CssTool implements Initializable {
                 if (cssText.getSkin() instanceof TextAreaSkin skin) {
                     var pos = cssText.localToScreen(skin.getCaretBounds());
                     autocomplete.show(cssText, pos.getCenterX(), pos.getCenterY() + pos.getHeight());
+                    cssText.requestFocus();
 
-                    int textPos = cssText.getCaretPosition();
-                    String recentText = cssText.getText(Math.max(0, textPos - 64), textPos);
-
-                    String reversed = new StringBuilder(recentText).reverse().toString();
-                    int length = 0;
-                    while (length < reversed.length() &&
-                            (Character.isAlphabetic(reversed.charAt(length)) || reversed.charAt(length) == '-')) {
-                        length++;
-                    }
-                    if (length > 0) length--;
-
-                    String world = recentText.substring(recentText.length() - length, recentText.length());
+                    String world = getCurrentlyEditedWorld();
                     autocompleteList.setItems(FXCollections.observableArrayList(world, world, world));
                 }
             }
-            else if (autocomplete.isShowing()) {
+        });
+
+        cssText.caretPositionProperty().addListener((o, oldValue, newValue) -> {
+            if (autocomplete.isShowing()) {
                 if (cssText.getSkin() instanceof TextAreaSkin skin) {
                     var pos = cssText.localToScreen(skin.getCaretBounds());
-                    autocomplete.show(cssText, pos.getCenterX(), pos.getCenterY() + pos.getHeight());
+                    String world = getCurrentlyEditedWorld();
+                    if (world.isEmpty()) {
+                        autocomplete.hide();
+                    } else {
+                        autocompleteList.setItems(FXCollections.observableArrayList(world, world, world));
+                        autocomplete.show(cssText, pos.getCenterX(), pos.getCenterY() + pos.getHeight());
+                        cssText.requestFocus();
+                    }
                 }
             }
         });
@@ -199,6 +228,21 @@ public class CssTool implements Initializable {
                 autocomplete.hide();
             }
         });
+    }
+
+    private String getCurrentlyEditedWorld() {
+        int textPos = cssText.getCaretPosition();
+        String recentText = cssText.getText(Math.max(0, textPos - 64), textPos);
+
+        String reversed = new StringBuilder(recentText).reverse().toString();
+        int length = 0;
+        while (length < reversed.length() &&
+                (Character.isAlphabetic(reversed.charAt(length)) || reversed.charAt(length) == '-')) {
+            length++;
+        }
+
+        String world = recentText.substring(recentText.length() - length, recentText.length());
+        return world;
     }
 
     private void fillControlStructure(Control control) {
