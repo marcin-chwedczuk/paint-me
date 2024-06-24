@@ -14,14 +14,15 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.skin.TextAreaSkin;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BackgroundPosition;
 import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.BorderWidths;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
-import org.reflections.serializers.JsonSerializer;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -69,9 +70,14 @@ public class CssTool implements Initializable {
     @FXML
     private TreeView<String> controlStructure;
 
+    private ListView<String> autocompleteList = new ListView<>();
+    private Popup autocomplete = new Popup();
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         System.out.println("INITIALIZING CSS TOOL");
+
+        autocomplete.getContent().add(autocompleteList);
 
         List<String> controls = List.of(
                 RadioButton.class.getName(),
@@ -142,6 +148,12 @@ public class CssTool implements Initializable {
             }
         });
 
+        cssText.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.ESCAPE) {
+                autocomplete.hide();
+            }
+        });
+
         cssText.addEventFilter(KeyEvent.KEY_RELEASED, event -> {
             if (event.getCode() == KeyCode.ENTER && event.isControlDown()) {
                 System.out.println("RELOADED CSS");
@@ -153,6 +165,39 @@ public class CssTool implements Initializable {
                 stylesheets.clear();
                 stylesheets.add(InMemoryCssStylesheet.getStylesheetUrl());
             }
+
+            if (event.getCode() == KeyCode.SPACE && event.isControlDown()) {
+                if (cssText.getSkin() instanceof TextAreaSkin skin) {
+                    var pos = cssText.localToScreen(skin.getCaretBounds());
+                    autocomplete.show(cssText, pos.getCenterX(), pos.getCenterY() + pos.getHeight());
+
+                    int textPos = cssText.getCaretPosition();
+                    String recentText = cssText.getText(Math.max(0, textPos - 64), textPos);
+
+                    String reversed = new StringBuilder(recentText).reverse().toString();
+                    int length = 0;
+                    while (length < reversed.length() &&
+                            (Character.isAlphabetic(reversed.charAt(length)) || reversed.charAt(length) == '-')) {
+                        length++;
+                    }
+                    if (length > 0) length--;
+
+                    String world = recentText.substring(recentText.length() - length, recentText.length());
+                    autocompleteList.setItems(FXCollections.observableArrayList(world, world, world));
+                }
+            }
+            else if (autocomplete.isShowing()) {
+                if (cssText.getSkin() instanceof TextAreaSkin skin) {
+                    var pos = cssText.localToScreen(skin.getCaretBounds());
+                    autocomplete.show(cssText, pos.getCenterX(), pos.getCenterY() + pos.getHeight());
+                }
+            }
+        });
+
+        cssText.focusedProperty().addListener((o, oldValue, newValue) -> {
+            if (!newValue) {
+                autocomplete.hide();
+            }
         });
     }
 
@@ -162,47 +207,26 @@ public class CssTool implements Initializable {
         control.skinProperty().addListener(o -> {
             Platform.runLater(() -> {
                 TreeItem<String> root = new TreeItem<>();
-                fillControlStructure(control, root, false);
+                fillControlStructure(control, root);
 
                 controlStructure.setRoot(root);
             });
         });
     }
 
-    private void fillControlStructure(Node current, TreeItem<String> currentItem, boolean skinNode) {
+    private void fillControlStructure(Node current, TreeItem<String> currentItem) {
         String cssClasses = String.join("", current.getStyleClass());
         String javaClass = current.getClass().getSimpleName();
-        currentItem.setValue(String.format("%s%s(%s)", skinNode ? "#" : "", javaClass, cssClasses));
-        System.out.println("ADDING " + currentItem.getValue() + " with skinNode = " + skinNode);
-
-        if (!skinNode) {
-            // addSkinNodes(current, currentItem);
-        }
+        currentItem.setValue(String.format("%s(%s)", javaClass, cssClasses));
 
         if (current instanceof Parent p) {
             for (Node child : p.getChildrenUnmodifiable()) {
                 TreeItem<String> childItem = new TreeItem<>();
-                fillControlStructure(child, childItem, skinNode);
+                fillControlStructure(child, childItem);
                 currentItem.getChildren().add(childItem);
             }
         }
     }
-
-    private void addSkinNodes(Node current, TreeItem<String> currentItem) {
-        if (current instanceof Skinnable s) {
-            Skin<?> skin = s.getSkin();
-            if (skin == null) return;
-
-            if (skin instanceof SkinBase<?> skinBase) {
-                for (Node child : skinBase.getChildren()) {
-                    TreeItem<String> childItem = new TreeItem<>();
-                    fillControlStructure(child, childItem, true);
-                    currentItem.getChildren().add(childItem);
-                }
-            }
-        }
-    }
-
 
     private static String formatValue(Control stylable, CssMetaData<Control, ?> cssMeta) {
         StyleableProperty<?> prop = cssMeta.getStyleableProperty(stylable);
