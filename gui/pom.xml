@@ -15,6 +15,8 @@
     <description>JavaFX Application</description>
 
     <properties>
+        <debug-profile-extra-jvm-arg />
+
         <extra-jvm-options-when-running-tests>
             --add-opens javafx.graphics/com.sun.javafx.application=ALL-UNNAMED
             --add-opens javafx.graphics/com.sun.glass.ui=ALL-UNNAMED
@@ -45,10 +47,19 @@
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-swing</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-web</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.reflections</groupId>
             <artifactId>reflections</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
         </dependency>
 
         <!-- Test dependencies -->
@@ -180,9 +191,8 @@
                         <option>--add-exports</option>
                         <option>javafx.graphics/com.sun.javafx.sg.prism=pl.marcinchwedczuk.paintme.gui</option>
                         <!-- uncomment to enable debugger's "Attach to Process..." -->
-                        <!--
-                        <option>-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=4444</option>
-                        -->
+
+                        <option>${debug-profile-extra-jvm-arg}</option>
                     </options>
                     <stripDebug>false</stripDebug>
                     <noHeaderFiles>true</noHeaderFiles>
@@ -202,4 +212,15 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>debug</id>
+            <properties>
+                <debug-profile-extra-jvm-arg>
+                    -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=4444
+                </debug-profile-extra-jvm-arg>
+            </properties>
+        </profile>
+    </profiles>
 </project>

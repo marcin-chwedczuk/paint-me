@@ -7,19 +7,49 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
-<SplitPane prefHeight="449.0" prefWidth="519.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.marcinchwedczuk.paintme.gui.csstool.CssTool">
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TreeView?>
+<SplitPane prefHeight="650.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.marcinchwedczuk.paintme.gui.csstool.CssTool">
     <SplitPane orientation="VERTICAL">
         <TextArea fx:id="cssText">abc</TextArea>
-        <TextArea fx:id="warnings" editable="false">abc</TextArea>
+        <ListView fx:id="cssProperties" editable="false" />
     </SplitPane>
     <SplitPane orientation="VERTICAL">
         <VBox>
-            <HBox>
+            <HBox VBox.vgrow="NEVER" alignment="BASELINE_LEFT" spacing="2">
                 <Label>Control:</Label>
-                <ComboBox fx:id="selectedControl"  />
+                <ComboBox fx:id="selectedControl" />
+
+                <Separator orientation="VERTICAL" />
+
+                <Label>Extra classes:</Label>
+                <TextField fx:id="extraClasses" />
             </HBox>
-            <BorderPane fx:id="controlContainer" />
+            <TabPane VBox.vgrow="ALWAYS">
+                <Tab text="Preview" closable="false">
+                    <VBox>
+                        <BorderPane fx:id="controlContainer" VBox.vgrow="ALWAYS" />
+                        <HBox VBox.vgrow="NEVER" alignment="CENTER_LEFT">
+                            <Rectangle fx:id="statusIcon" width="16" height="16" HBox.hgrow="NEVER" />
+                            <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS" spacing="2">
+                                <Label>Zoom:</Label>
+                                <Slider fx:id="zoomSlider" />
+                            </HBox>
+                        </HBox>
+                    </VBox>
+                </Tab>
+                <Tab text="Structure" closable="false">
+                    <TreeView fx:id="controlStructure" />
+                </Tab>
+            </TabPane>
         </VBox>
-        <TextArea fx:id="helpText" editable="false" />
+        <TextArea fx:id="warnings" editable="false">abc</TextArea>
     </SplitPane>
 </SplitPane>

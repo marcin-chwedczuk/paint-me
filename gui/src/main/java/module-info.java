@@ -1,11 +1,14 @@
+import java.net.spi.URLStreamHandlerProvider;
+
 module pl.marcinchwedczuk.paintme.gui {
     requires pl.marcinchwedczuk.paintme.domain;
 
     requires javafx.controls;
     requires javafx.fxml;
-    requires java.desktop;
+    requires javafx.web;
     requires javafx.swing;
     requires org.reflections;
+    requires org.jsoup;
 
     exports pl.marcinchwedczuk.paintme.gui;
     exports pl.marcinchwedczuk.paintme.gui.easel;
@@ -24,4 +27,6 @@ module pl.marcinchwedczuk.paintme.gui {
     opens pl.marcinchwedczuk.paintme.gui.dynamiccss;
     opens pl.marcinchwedczuk.paintme.gui.csstool;
     opens icons;
+
+    provides java.net.spi.URLStreamHandlerProvider with pl.marcinchwedczuk.paintme.gui.ClasspathURLStreamHandlerProvider;
 }
