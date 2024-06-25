@@ -26,7 +26,7 @@ public class JavaFxControlClassesFinder {
                     if (controlClass.getName().contains("$")) return false;
                     if (controlClass.getName().endsWith("Cell")) return false;
                     if (!"javafx.scene.control".equals(controlClass.getPackageName())) return false;
-                    return Modifier.isPublic(controlClass.getModifiers());
+                    return Modifier.isPublic(controlClass.getModifiers()) && !Modifier.isAbstract(controlClass.getModifiers());
                 })
                 .sorted(Comparator.comparing(Class::getSimpleName))
                 .toList();

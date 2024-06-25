@@ -1,27 +1,26 @@
 package pl.marcinchwedczuk.paintme.gui.csstool;
 
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.web.WebEvent;
+import javafx.scene.web.WebView;
 import javafx.stage.Stage;
-import org.reflections.Reflections;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class CssTool implements Initializable {
@@ -48,7 +47,7 @@ public class CssTool implements Initializable {
     private AutocompleteTextArea cssText;
 
     @FXML
-    private TextArea warnings;
+    private WebView oracleHelpViewer;
 
     @FXML
     private ComboBox<String> selectedControl;
@@ -67,6 +66,20 @@ public class CssTool implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         System.out.println("INITIALIZING CSS TOOL");
+
+        try {
+            oracleHelpViewer.getEngine().load(getClass().getResource("javafx-css-docs.html").toExternalForm());
+            oracleHelpViewer.setContextMenuEnabled(false);
+
+            oracleHelpViewer.getEngine().setOnStatusChanged((WebEvent<String> event) -> {
+                if (event.getData() != null && event.getData().contains("javafx-css-docs.html")) {
+                    System.out.println("LOADING: " + event.getData());
+                    oracleHelpViewer.getEngine().load(event.getData());
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         List<String> controlClassNames = JavaFxControlClassesFinder.findControlClasses().stream()
                 .map(Class::getName)
@@ -114,6 +127,8 @@ public class CssTool implements Initializable {
                                 .toList();
                 cssText.setSuggestions(cssPropsNames);
 
+                oracleHelpViewer.getEngine().executeScript("{ var el = document.getElementById('" + controlClass.getSimpleName().toLowerCase() + "'); if (el) el.scrollIntoView(); }");
+
             } catch (Exception e) {
                 StringWriter out = new StringWriter();
                 PrintWriter writer = new PrintWriter(out);
@@ -121,7 +136,8 @@ public class CssTool implements Initializable {
                 e.printStackTrace(writer);
 
                 writer.flush();
-                warnings.setText(out.toString());
+
+                new Alert(Alert.AlertType.WARNING, out.toString(), ButtonType.OK).showAndWait();
             }
         });
     }

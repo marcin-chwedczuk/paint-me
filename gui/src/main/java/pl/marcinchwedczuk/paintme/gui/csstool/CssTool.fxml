@@ -18,10 +18,11 @@
 <?import javafx.scene.control.TreeView?>
 <?import pl.marcinchwedczuk.paintme.gui.csstool.AutocompleteTextArea?>
 <?import pl.marcinchwedczuk.paintme.gui.csstool.ControlStructureTreeView?>
+<?import javafx.scene.web.WebView?>
 <SplitPane prefHeight="650.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.marcinchwedczuk.paintme.gui.csstool.CssTool">
     <SplitPane orientation="VERTICAL">
         <AutocompleteTextArea fx:id="cssText">abc</AutocompleteTextArea>
-        <ListView fx:id="cssProperties" editable="false" />
+        <WebView fx:id="oracleHelpViewer" />
     </SplitPane>
     <SplitPane orientation="VERTICAL">
         <VBox>
@@ -52,6 +53,7 @@
                 </Tab>
             </TabPane>
         </VBox>
-        <TextArea fx:id="warnings" editable="false">abc</TextArea>
+        <ListView fx:id="cssProperties" editable="false" />
+
     </SplitPane>
 </SplitPane>

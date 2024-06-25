@@ -2,12 +2,9 @@ package pl.marcinchwedczuk.paintme.gui;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
-import pl.marcinchwedczuk.paintme.gui.dragdrop.HelloDragAndDrop;
 import pl.marcinchwedczuk.paintme.gui.dynamiccss.FxCssURLStreamHandler;
 import pl.marcinchwedczuk.paintme.gui.mainwindow.MainWindow;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLStreamHandler;
 import java.net.URLStreamHandlerFactory;
@@ -22,7 +19,7 @@ public class App extends Application {
         // HelloDragAndDrop.start(stage);
     }
 
-    public static void main(String[] args) throws MalformedURLException {
+    public static void main(String[] args) throws Exception {
         // TODO: Blurry text on Linux - try to fix this....
         // System.setProperty("prism.lcdtext", "true");
 
