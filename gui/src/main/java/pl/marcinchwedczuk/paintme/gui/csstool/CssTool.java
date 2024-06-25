@@ -2,9 +2,6 @@ package pl.marcinchwedczuk.paintme.gui.csstool;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.css.CssMetaData;
-import javafx.css.Styleable;
-import javafx.css.StyleableProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -13,19 +10,14 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.BackgroundPosition;
-import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.BorderWidths;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class CssTool implements Initializable {
     public static CssTool showOn(Stage window) {
@@ -63,7 +55,7 @@ public class CssTool implements Initializable {
     private ListView<String> cssProperties;
 
     @FXML
-    private TreeView<String> controlStructure;
+    private ControlStructureTreeView controlStructure;
 
     // TODO: Split into several classes
 
@@ -84,51 +76,28 @@ public class CssTool implements Initializable {
 
             try {
                 Class<?> controlClass = Class.forName(newValue);
+
                 Control control = (Control) controlClass.newInstance();
 
                 controlContainer.setCenter(control);
                 BorderPane.setAlignment(control, Pos.CENTER);
-                fillControlStructure(control);
+                controlStructure.setObservedControl(control);
 
                 if (control instanceof Labeled) {
                     ((Labeled) control).setText("Foobar");
                 }
 
-                // Get list of properties
-                StringBuilder sb = new StringBuilder();
-                List<String> items = new ArrayList<>();
+                List<CssProperty> cssProps = JavaFxCssUtil.discoverCssProperties(controlClass);
 
-                List<? extends Styleable> ll = List.of(control);
+                var cssPropsWithValues = cssProps.stream()
+                        .map(prop -> String.format("%s: %s", prop.name(), prop.defaultValue()))
+                        .toList();
+                cssProperties.setItems(FXCollections.observableArrayList(cssPropsWithValues));
 
-                Class<?> current = controlClass;
-                while (!current.getSimpleName().equals("Object")) {
-                    Method m = current.getMethod("getClassCssMetaData");
-                    if (m != null) {
-                        List<CssMetaData<Control, ?>> stylables = (List<CssMetaData<Control, ?>>) m.invoke(null);
-                        for (CssMetaData<Control, ?> entry : stylables) {
-                            sb.append(entry.getProperty()).append(": ")
-                                    .append(formatValue(control, entry)).append('\n');
-
-                            var subs = (List<CssMetaData<Control, ?>>) (Object) entry.getSubProperties();
-                            if (subs != null) {
-                                for (var sub : subs) {
-                                    sb.append('\t').append(sub.getProperty()).append(": ")
-                                            .append(formatValue(control, sub)).append('\n');
-                                }
-                            }
-
-                            items.add(sb.toString()); sb.delete(0, sb.length());
-                        }
-
-                        break;
-                    }
-
-                    current = current.getSuperclass();
-                }
-
-                Collections.sort(items);
-                cssProperties.setItems(FXCollections.observableList(items));
-                cssText.setSuggestions(items);
+                var cssPropsNames = cssProps.stream()
+                                .map(CssProperty::name)
+                                .toList();
+                cssText.setSuggestions(cssPropsNames);
 
             } catch (Exception e) {
                 StringWriter out = new StringWriter();
@@ -142,92 +111,4 @@ public class CssTool implements Initializable {
         });
     }
 
-    private String getCurrentlyEditedWorld() {
-        int textPos = cssText.getCaretPosition();
-        String recentText = cssText.getText(Math.max(0, textPos - 64), textPos);
-
-        String reversed = new StringBuilder(recentText).reverse().toString();
-        int length = 0;
-        while (length < reversed.length() &&
-                (Character.isAlphabetic(reversed.charAt(length)) || reversed.charAt(length) == '-')) {
-            length++;
-        }
-
-        String world = recentText.substring(recentText.length() - length, recentText.length());
-        return world;
-    }
-
-    private void fillControlStructure(Control control) {
-        controlStructure.setRoot(null);
-
-        // TODO: Unsubscribe later
-        control.skinProperty().addListener(o -> {
-            Platform.runLater(() -> {
-                TreeItem<String> root = new TreeItem<>();
-                fillControlStructure(control, root);
-
-                controlStructure.setRoot(root);
-            });
-        });
-    }
-
-    private void fillControlStructure(Node current, TreeItem<String> currentItem) {
-        String cssClasses = String.join("", current.getStyleClass());
-        String javaClass = current.getClass().getSimpleName();
-        currentItem.setValue(String.format("%s(%s)", javaClass, cssClasses));
-
-        if (current instanceof Parent p) {
-            for (Node child : p.getChildrenUnmodifiable()) {
-                TreeItem<String> childItem = new TreeItem<>();
-                fillControlStructure(child, childItem);
-                currentItem.getChildren().add(childItem);
-            }
-        }
-    }
-
-    private static String formatValue(Control stylable, CssMetaData<Control, ?> cssMeta) {
-        StyleableProperty<?> prop = cssMeta.getStyleableProperty(stylable);
-        if (prop == null) {
-            if (cssMeta.isInherits()) return "inherits";
-            return "#" + formatValue(cssMeta.getInitialValue(stylable));
-        }
-
-        return formatValue(prop.getValue());
-    }
-
-    private static String formatValue(Object obj) {
-        if (obj == null) return "null";
-        if (obj instanceof Object[] arr) {
-            return Arrays.stream(arr)
-                    .map(CssTool::formatValue)
-                    .collect(Collectors.joining(",", "[", "]"));
-        }
-
-        // Missing toString's from accessible classes
-        if (obj instanceof BorderWidths bw) {
-            // TODO
-            return String.format("BorderWidths %f %f %f %f",
-                    bw.getTop(), bw.getRight(), bw.getBottom(), bw.getLeft());
-        }
-
-        if (obj instanceof BackgroundSize bs) {
-            // TODO
-            return String.format("BackgroundSize %f %f", bs.getWidth(), bs.getHeight());
-        }
-
-        if (obj instanceof BackgroundPosition bp) {
-            // TODO
-            return String.format("BackgroundPosition %f %f", bp.getHorizontalPosition(), bp.getVerticalPosition());
-        }
-
-        // Missing toString's from inaccessible classes
-        String str = obj.toString();
-
-        if (str != null && str.startsWith("[com.sun")) {
-            // Serialize to JSON as a last resort
-            // TODO: Will require playing with add-opens to get reflections access meh :(
-        }
-
-        return str;
-    }
 }

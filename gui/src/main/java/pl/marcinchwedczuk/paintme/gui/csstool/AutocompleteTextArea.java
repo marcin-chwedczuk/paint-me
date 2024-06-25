@@ -79,12 +79,7 @@ public class AutocompleteTextArea extends TextArea {
         // Handle Arrow Up, Down and Tab when popup is open.
         addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (!autocompletePopup.isShowing()) return;
-            /*
-            if (event.getCode() == KeyCode.ESCAPE) {
-                autocompletePopup.hide();
-                event.consume();
-            }
-            */
+
             var selectionModel = autocompleteListView.getSelectionModel();
             int selectedIndex = selectionModel.getSelectedIndex();
 
