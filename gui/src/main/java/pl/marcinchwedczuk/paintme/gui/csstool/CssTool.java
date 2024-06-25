@@ -2,7 +2,6 @@ package pl.marcinchwedczuk.paintme.gui.csstool;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.css.CssMetaData;
 import javafx.css.Styleable;
 import javafx.css.StyleableProperty;
@@ -14,15 +13,10 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.skin.TextAreaSkin;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BackgroundPosition;
 import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.BorderWidths;
-import javafx.scene.text.Text;
-import javafx.stage.Popup;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -54,7 +48,7 @@ public class CssTool implements Initializable {
     }
 
     @FXML
-    private TextArea cssText;
+    private AutocompleteTextArea cssText;
 
     @FXML
     private TextArea warnings;
@@ -71,18 +65,11 @@ public class CssTool implements Initializable {
     @FXML
     private TreeView<String> controlStructure;
 
-    private ListView<String> autocompleteList = new ListView<>();
-    private Popup autocomplete = new Popup();
-
     // TODO: Split into several classes
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         System.out.println("INITIALIZING CSS TOOL");
-
-        autocompleteList.setFocusTraversable(false);
-        autocomplete.getContent().add(autocompleteList);
-        autocomplete.setHideOnEscape(true);
 
         List<String> controls = List.of(
                 RadioButton.class.getName(),
@@ -141,6 +128,7 @@ public class CssTool implements Initializable {
 
                 Collections.sort(items);
                 cssProperties.setItems(FXCollections.observableList(items));
+                cssText.setSuggestions(items);
 
             } catch (Exception e) {
                 StringWriter out = new StringWriter();
@@ -150,87 +138,6 @@ public class CssTool implements Initializable {
 
                 writer.flush();
                 warnings.setText(out.toString());
-            }
-        });
-
-        cssText.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-            if (event.getCode() == KeyCode.ESCAPE) {
-                autocomplete.hide();
-                event.consume();
-            }
-
-            if (autocomplete.isShowing()) {
-                int selected = autocompleteList.getSelectionModel().getSelectedIndex();
-                if (autocompleteList.getItems().isEmpty()) return;
-
-                if (event.getCode() == KeyCode.UP) {
-                    if (selected == -1) {
-                        autocompleteList.getSelectionModel().select(0);
-                    } else {
-                        autocompleteList.getSelectionModel().select(Math.max(0, autocompleteList.getSelectionModel().getSelectedIndex() - 1));
-                    }
-                    event.consume();
-                } else if (event.getCode() == KeyCode.DOWN) {
-                    if (selected == -1) {
-                        autocompleteList.getSelectionModel().select(0);
-                    } else {
-                        autocompleteList.getSelectionModel().select(Math.min(autocompleteList.getItems().size()-1, autocompleteList.getSelectionModel().getSelectedIndex() + 1));
-                    }
-                    event.consume();
-                } else if (event.getCode() == KeyCode.TAB) {
-                    autocomplete.hide();
-                    if (selected != -1) {
-                        String autocompletedText = autocompleteList.getSelectionModel().getSelectedItem();
-                        cssText.insertText(cssText.getCaretPosition(), "AUTO:" + autocompletedText);
-                    }
-                    event.consume();
-                }
-            }
-        });
-
-        cssText.addEventFilter(KeyEvent.KEY_RELEASED, event -> {
-            if (event.getCode() == KeyCode.ENTER && event.isControlDown()) {
-                System.out.println("RELOADED CSS");
-                InMemoryCssStylesheet.setContents(cssText.getText());
-
-                if (controlContainer.getChildren().isEmpty()) return;
-
-                ObservableList<String> stylesheets = ((Control) controlContainer.getChildren().get(0)).getStylesheets();
-                stylesheets.clear();
-                stylesheets.add(InMemoryCssStylesheet.getStylesheetUrl());
-            }
-
-            if (event.getCode() == KeyCode.SPACE && event.isControlDown()) {
-                if (cssText.getSkin() instanceof TextAreaSkin skin) {
-                    var pos = cssText.localToScreen(skin.getCaretBounds());
-                    autocomplete.show(cssText, pos.getCenterX(), pos.getCenterY() + pos.getHeight());
-                    cssText.requestFocus();
-
-                    String world = getCurrentlyEditedWorld();
-                    autocompleteList.setItems(FXCollections.observableArrayList(world, world, world));
-                }
-            }
-        });
-
-        cssText.caretPositionProperty().addListener((o, oldValue, newValue) -> {
-            if (autocomplete.isShowing()) {
-                if (cssText.getSkin() instanceof TextAreaSkin skin) {
-                    var pos = cssText.localToScreen(skin.getCaretBounds());
-                    String world = getCurrentlyEditedWorld();
-                    if (world.isEmpty()) {
-                        autocomplete.hide();
-                    } else {
-                        autocompleteList.setItems(FXCollections.observableArrayList(world, world, world));
-                        autocomplete.show(cssText, pos.getCenterX(), pos.getCenterY() + pos.getHeight());
-                        cssText.requestFocus();
-                    }
-                }
-            }
-        });
-
-        cssText.focusedProperty().addListener((o, oldValue, newValue) -> {
-            if (!newValue) {
-                autocomplete.hide();
             }
         });
     }

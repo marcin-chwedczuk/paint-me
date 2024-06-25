@@ -1,10 +1,9 @@
 package pl.marcinchwedczuk.paintme.gui.csstool;
 
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
-import javafx.scene.control.ListView;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import javafx.scene.control.skin.TextAreaSkin;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -18,13 +17,14 @@ public class AutocompleteTextArea extends TextArea {
     private final ListView<String> autocompleteListView = new ListView<>();
     private final Popup autocompletePopup = new Popup();
 
-    private final FilteredList<String> suggestions = new FilteredList<>(FXCollections.observableArrayList());
+    private final ObservableList<String> unfilteredSuggestions = FXCollections.observableArrayList();
+    private final FilteredList<String> filteredSuggestions = new FilteredList<>(unfilteredSuggestions);
 
     public AutocompleteTextArea() {
         // Prevent listView from capturing key events like Esc, Array Up & Down
         autocompleteListView.setFocusTraversable(false);
         autocompleteListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        autocompleteListView.setItems(suggestions);
+        autocompleteListView.setItems(filteredSuggestions);
 
         autocompletePopup.getContent().add(autocompleteListView);
         autocompletePopup.setHideOnEscape(true);
@@ -37,8 +37,7 @@ public class AutocompleteTextArea extends TextArea {
                 String world = getWordBeforeCaret();
                 filterSuggestions(world);
 
-                showAutocompletePopupAtCaret();
-                // requestFocus();
+                showAutocompletePopupAtCaret(true);
             }
         });
 
@@ -59,10 +58,21 @@ public class AutocompleteTextArea extends TextArea {
                     return;
                 }
 
-                filterSuggestions(world);
-                showAutocompletePopupAtCaret();
+                var selectionModel = autocompleteListView.getSelectionModel();
+                String oldSelection = selectionModel.getSelectedItem();
 
-                // requestFocus ?
+                filterSuggestions(world);
+                showAutocompletePopupAtCaret(false);
+
+                // Preserve old selection
+                if (oldSelection != null && filteredSuggestions.contains(oldSelection)) {
+                    selectionModel.select(oldSelection);
+                }
+
+                // If there is no selection because of e.g. backspace select first item
+                if (selectionModel.isEmpty() && !filteredSuggestions.isEmpty()) {
+                    selectSuggestion(0);
+                }
             }
         });
 
@@ -80,37 +90,50 @@ public class AutocompleteTextArea extends TextArea {
 
             if (event.getCode() == KeyCode.UP) {
                 event.consume();
-                selectionModel.select(Math.max(0, selectedIndex - 1));
+                selectSuggestion(selectedIndex - 1);
             } else if (event.getCode() == KeyCode.DOWN) {
                 event.consume();
-                selectionModel.select(Math.min(suggestions.size() - 1, selectedIndex + 1));
+                selectSuggestion(selectedIndex + 1);
             } else if (event.getCode() == KeyCode.TAB) {
                 event.consume();
 
                 autocompletePopup.hide();
                 if (selectedIndex != -1) {
                     String suggestion = selectionModel.getSelectedItem();
-                    // TODO: Handle world before suggestion
-                    insertText(getCaretPosition(), suggestion);
+
+                    String before = getWordBeforeCaret();
+                    var textRange = IndexRange.normalize(getCaretPosition() - before.length(), getCaretPosition());
+                    replaceText(textRange, suggestion);
                 }
             }
         });
     }
 
-    private void showAutocompletePopupAtCaret() {
+    private void showAutocompletePopupAtCaret(boolean firstTime) {
         if (getSkin() instanceof TextAreaSkin skin) {
             var screenCaretPosition = localToScreen(skin.getCaretBounds());
             autocompletePopup.show(this, screenCaretPosition.getCenterX(), screenCaretPosition.getCenterY() + screenCaretPosition.getHeight());
         }
+
+        if (firstTime && !filteredSuggestions.isEmpty()) {
+            selectSuggestion(0);
+        }
+    }
+
+    private void selectSuggestion(int newIndex) {
+        if (filteredSuggestions.isEmpty()) return;
+
+        var selectionModel = autocompleteListView.getSelectionModel();
+        selectionModel.select(Math.max(0, Math.min(filteredSuggestions.size() - 1, newIndex)));
     }
 
     private void filterSuggestions(String byWorld) {
-        suggestions.setPredicate(s -> (s != null) && s.contains(byWorld));
+        filteredSuggestions.setPredicate(s -> (s != null) && s.contains(byWorld));
     }
 
-    public void setSuggestions(Collection<String> suggestions) {
-        this.suggestions.clear();
-        this.suggestions.addAll(suggestions);
+    public void setSuggestions(Collection<String> filteredSuggestions) {
+        unfilteredSuggestions.clear();
+        unfilteredSuggestions.addAll(filteredSuggestions);
     }
 
     private String getWordBeforeCaret() {

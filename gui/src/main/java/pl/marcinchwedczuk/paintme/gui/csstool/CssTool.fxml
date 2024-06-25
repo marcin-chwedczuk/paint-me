@@ -16,9 +16,10 @@
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TreeView?>
+<?import pl.marcinchwedczuk.paintme.gui.csstool.AutocompleteTextArea?>
 <SplitPane prefHeight="650.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.marcinchwedczuk.paintme.gui.csstool.CssTool">
     <SplitPane orientation="VERTICAL">
-        <TextArea fx:id="cssText">abc</TextArea>
+        <AutocompleteTextArea fx:id="cssText">abc</AutocompleteTextArea>
         <ListView fx:id="cssProperties" editable="false" />
     </SplitPane>
     <SplitPane orientation="VERTICAL">
