@@ -26,7 +26,14 @@ import pl.marcinchwedczuk.paintme.gui.util.ExceptionUtil;
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.OpenOption;
+import java.nio.file.Paths;
 import java.util.*;
+
+import static java.nio.file.StandardOpenOption.CREATE;
+import static java.nio.file.StandardOpenOption.WRITE;
 
 public class CssTool implements Initializable {
     public static CssTool showOn(Stage window) {
@@ -41,6 +48,7 @@ public class CssTool implements Initializable {
             window.setResizable(true);
 
             window.setOnShown(controller::onWindowShown);
+            window.setOnCloseRequest(controller::onWindowClose);
             window.show();
 
             return controller;
@@ -48,6 +56,7 @@ public class CssTool implements Initializable {
             throw new RuntimeException(e);
         }
     }
+
 
 
     @FXML
@@ -115,9 +124,31 @@ public class CssTool implements Initializable {
                 new Alert(Alert.AlertType.ERROR, msg, ButtonType.OK).showAndWait();
             }
         });
+
+        tryLoadPreviousSession();
     }
 
     private void onWindowShown(WindowEvent e) {
+    }
+
+
+    /// TODO: Extract to a sepratate module for preserving last state
+    private void onWindowClose(WindowEvent windowEvent) {
+        try {
+            Files.writeString(Paths.get("css-tool-last-edited.css"), cssText.getText(), StandardCharsets.UTF_8, WRITE, CREATE);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void tryLoadPreviousSession() {
+        try {
+            String text = Files.readString(Paths.get("css-tool-last-edited.css"), StandardCharsets.UTF_8);
+            cssText.setText(text);
+        } catch (Exception e) {
+            // TODO: add logging library
+            e.printStackTrace();
+        }
     }
 
     private ChangeListener<String> extraClassesTextChangeListener = null;
