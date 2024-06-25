@@ -1,9 +1,12 @@
 package pl.marcinchwedczuk.paintme.gui.csstool;
 
+import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -11,17 +14,15 @@ import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Scale;
-import javafx.scene.web.WebEvent;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
+import pl.marcinchwedczuk.paintme.gui.util.ExceptionUtil;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 
 public class CssTool implements Initializable {
@@ -48,7 +49,8 @@ public class CssTool implements Initializable {
     private AutocompleteTextArea cssText;
 
     @FXML
-    private WebView oracleHelpViewer;
+    private WebView htmlHelpViewer;
+    private HtmlHelpViewerWrapper htmlHelpViewerWrapper;
 
     @FXML
     private ComboBox<String> selectedControl;
@@ -62,25 +64,21 @@ public class CssTool implements Initializable {
     @FXML
     private ControlStructureTreeView controlStructure;
 
-    // TODO: Split into several classes
+    @FXML
+    private CheckBox controlEnabled;
+
+    @FXML
+    private Slider zoomSlider;
+
+    @FXML
+    private Rectangle statusIcon;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         System.out.println("INITIALIZING CSS TOOL");
 
-        try {
-            oracleHelpViewer.getEngine().load(getClass().getResource("javafx-css-docs.html").toExternalForm());
-            oracleHelpViewer.setContextMenuEnabled(false);
-
-            oracleHelpViewer.getEngine().setOnStatusChanged((WebEvent<String> event) -> {
-                if (event.getData() != null && event.getData().contains("javafx-css-docs.html")) {
-                    System.out.println("LOADING: " + event.getData());
-                    oracleHelpViewer.getEngine().load(event.getData());
-                }
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        htmlHelpViewerWrapper = new HtmlHelpViewerWrapper(htmlHelpViewer);
+        htmlHelpViewerWrapper.initialize();
 
         List<String> controlClassNames = JavaFxControlClassesFinder.findControlClasses().stream()
                 .map(Class::getName)
@@ -88,63 +86,140 @@ public class CssTool implements Initializable {
         selectedControl.setItems(FXCollections.observableArrayList(controlClassNames));
 
         cssText.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
+            statusIcon.setFill(Color.YELLOW);
+
             if (e.getCode() == KeyCode.ENTER && e.isControlDown()) {
                 e.consume();
 
-                InMemoryCssStylesheet.setContents(cssText.getText());
-                Node node = controlContainer.getCenter();
-                if (node != null) {
-                    ((Control)node).getStylesheets().clear();
-                    ((Control)node).getStylesheets().add(InMemoryCssStylesheet.getStylesheetUrl());
-                }
+                reloadCss();
             }
         });
 
         selectedControl.getSelectionModel().selectedItemProperty().addListener((o, oldValue, newValue) -> {
-            controlContainer.getChildren().clear();
+            uninstallControl();
 
             try {
-                Class<?> controlClass = Class.forName(newValue);
-
-                Control control = (Control) controlClass.newInstance();
-
-                controlContainer.setCenter(control);
-
-                // TODO: Connect to zoom
-                control.getTransforms().add(new Scale(3, 3));
-
-                BorderPane.setAlignment(control, Pos.CENTER);
-                controlStructure.setObservedControl(control);
-
-                if (control instanceof Labeled) {
-                    ((Labeled) control).setText("Foobar");
-                }
-
-                List<CssProperty> cssProps = JavaFxCssUtil.discoverCssProperties(controlClass);
-
-                var cssPropsWithValues = cssProps.stream()
-                        .map(prop -> String.format("%s: %s", prop.name(), prop.defaultValue()))
-                        .toList();
-                cssProperties.setItems(FXCollections.observableArrayList(cssPropsWithValues));
-
-                var cssPropsNames = cssProps.stream()
-                                .map(CssProperty::name)
-                                .toList();
-                cssText.setSuggestions(cssPropsNames);
-
-                oracleHelpViewer.getEngine().executeScript("{ var el = document.getElementById('" + controlClass.getSimpleName().toLowerCase() + "'); if (el) el.scrollIntoView(); }");
-
+                installControl(newValue);
             } catch (Exception e) {
-                StringWriter out = new StringWriter();
-                PrintWriter writer = new PrintWriter(out);
+                statusIcon.setFill(Color.RED);
 
-                e.printStackTrace(writer);
-
-                writer.flush();
-
-                new Alert(Alert.AlertType.WARNING, out.toString(), ButtonType.OK).showAndWait();
+                String msg = ExceptionUtil.toReadableString(e);
+                new Alert(Alert.AlertType.ERROR, msg, ButtonType.OK).showAndWait();
             }
         });
     }
 
+    private void installControl(String controlClassName) throws Exception {
+        Class<?> controlClass = Class.forName(controlClassName);
+        Control control = (Control) controlClass.newInstance();
+
+        controlContainer.setCenter(control);
+        BorderPane.setAlignment(control, Pos.CENTER);
+
+        controlStructure.setObservedControl(control);
+
+        addExampleContent(control);
+
+        // Control enabled state
+        controlEnabled.setSelected(true);
+        control.disableProperty().bind(controlEnabled.selectedProperty().not());
+
+        // Control Zoom
+        setupZoom(control);
+
+        List<CssProperty> cssProps = JavaFxCssUtil.discoverCssProperties(controlClass);
+
+        var cssPropsWithValues = cssProps.stream()
+                .map(prop -> String.format("%s: %s", prop.name(), prop.defaultValue()))
+                .toList();
+        cssProperties.setItems(FXCollections.observableArrayList(cssPropsWithValues));
+
+        var cssPropsNames = cssProps.stream()
+                        .map(CssProperty::name)
+                        .toList();
+        cssText.setSuggestions(cssPropsNames);
+
+        htmlHelpViewerWrapper.showHelpFor(controlClass);
+
+        statusIcon.setFill(Color.YELLOW);
+    }
+
+
+    private void uninstallControl() {
+        if (controlContainer.getChildren().isEmpty()) return;
+
+        var controlToRemove = (Control)controlContainer.getChildren().get(0);
+        controlContainer.getChildren().clear();
+
+        controlStructure.setObservedControl(null);
+
+        controlToRemove.disableProperty().unbind();
+
+        if (!controlToRemove.getTransforms().isEmpty()) {
+            Scale transform = (Scale) controlToRemove.getTransforms().get(0);
+            transform.xProperty().unbind();
+            transform.yProperty().unbind();
+        }
+
+        if (zoomListenerForBounds != null) {
+            controlContainer.layoutBoundsProperty().removeListener(zoomListenerForBounds);
+        }
+    }
+
+    private ChangeListener<Bounds> zoomListenerForBounds = null;
+
+    private void setupZoom(Control control) {
+        Scale scaleTransform = new Scale(1, 1);
+        scaleTransform.xProperty().bind(zoomSlider.valueProperty());
+        scaleTransform.yProperty().bind(zoomSlider.valueProperty());
+        control.getTransforms().add(scaleTransform);
+        // Be default scales around top left corner, we need to fix manually...
+        zoomListenerForBounds = (o, oldValue, newValue) -> {
+            System.out.println("LAYOUT EVENT");
+            scaleTransform.setPivotX(control.getWidth() / 2);
+            scaleTransform.setPivotY(control.getHeight() / 2);
+        };
+        controlContainer.layoutBoundsProperty().addListener(zoomListenerForBounds);
+
+        Platform.runLater(() -> {
+            // manually fire once - layoutBounds will not change until container is resized.
+            // WARNING: Needs to run later. TODO: Figure out why...
+            zoomListenerForBounds.changed(null, null, null);
+        });
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void addExampleContent(Control control) {
+        if (control instanceof Labeled) {
+            ((Labeled) control).setText("Lorem ipsum");
+        }
+
+        if (control instanceof ListView) {
+            ((ListView<Object>) control).setItems(FXCollections.observableArrayList(
+                    "Option 1",
+                    "Option 2",
+                    "Option 3"
+            ));
+        }
+
+        if (control instanceof TreeView) {
+            var root = new TreeItem<Object>("Root");
+            root.getChildren().add(new TreeItem<>("Child 1"));
+            root.getChildren().add(new TreeItem<>("Child 2"));
+            ((TreeView<Object>)control).setRoot(root);
+        }
+
+        // TODO: Add other controls...
+    }
+
+    private void reloadCss() {
+        InMemoryCssStylesheet.setContents(cssText.getText());
+        Node node = controlContainer.getCenter();
+        if (node != null) {
+            ((Control)node).getStylesheets().clear();
+            ((Control)node).getStylesheets().add(InMemoryCssStylesheet.getStylesheetUrl());
+        }
+
+        statusIcon.setFill(Color.GREEN);
+    }
 }
