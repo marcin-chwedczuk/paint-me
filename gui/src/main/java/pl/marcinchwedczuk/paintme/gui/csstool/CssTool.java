@@ -11,6 +11,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.transform.Scale;
 import javafx.scene.web.WebEvent;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
@@ -108,6 +109,10 @@ public class CssTool implements Initializable {
                 Control control = (Control) controlClass.newInstance();
 
                 controlContainer.setCenter(control);
+
+                // TODO: Connect to zoom
+                control.getTransforms().add(new Scale(3, 3));
+
                 BorderPane.setAlignment(control, Pos.CENTER);
                 controlStructure.setObservedControl(control);
 
