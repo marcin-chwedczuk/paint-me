@@ -10,8 +10,13 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+import org.reflections.Reflections;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -63,13 +68,23 @@ public class CssTool implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         System.out.println("INITIALIZING CSS TOOL");
 
-        List<String> controls = List.of(
-                RadioButton.class.getName(),
-                Button.class.getName(),
-                CheckBox.class.getName()
-        );
+        List<String> controlClassNames = JavaFxControlClassesFinder.findControlClasses().stream()
+                .map(Class::getName)
+                .toList();
+        selectedControl.setItems(FXCollections.observableArrayList(controlClassNames));
 
-        selectedControl.setItems(FXCollections.observableList(new ArrayList<>(controls)));
+        cssText.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
+            if (e.getCode() == KeyCode.ENTER && e.isControlDown()) {
+                e.consume();
+
+                InMemoryCssStylesheet.setContents(cssText.getText());
+                Node node = controlContainer.getCenter();
+                if (node != null) {
+                    ((Control)node).getStylesheets().clear();
+                    ((Control)node).getStylesheets().add(InMemoryCssStylesheet.getStylesheetUrl());
+                }
+            }
+        });
 
         selectedControl.getSelectionModel().selectedItemProperty().addListener((o, oldValue, newValue) -> {
             controlContainer.getChildren().clear();

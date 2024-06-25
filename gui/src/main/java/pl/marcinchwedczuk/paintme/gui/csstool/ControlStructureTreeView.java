@@ -31,6 +31,8 @@ public class ControlStructureTreeView extends TreeView<String> {
         observedControl.addListener((o, oldValue, newValue) -> {
             setRoot(null);
 
+            // Skin is only available when control is added to scene graph.
+
             if (oldValue != null) {
                 oldValue.skinProperty().removeListener(onObservedControlSkinChange);
             }
@@ -49,6 +51,12 @@ public class ControlStructureTreeView extends TreeView<String> {
                 .collect(Collectors.joining(" "));
 
         String javaClass = current.getClass().getSimpleName();
+
+        // Anonymous class e.g. new Button { foo... }, in that case use superclass
+        if (javaClass.isEmpty()) {
+            javaClass = current.getClass().getSuperclass().getSimpleName();
+        }
+
         currentItem.setValue(String.format("%s(%s)", javaClass, cssClasses));
         currentItem.setExpanded(true);
 

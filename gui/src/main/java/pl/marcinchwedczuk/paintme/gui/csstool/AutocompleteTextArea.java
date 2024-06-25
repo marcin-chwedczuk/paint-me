@@ -89,7 +89,7 @@ public class AutocompleteTextArea extends TextArea {
             } else if (event.getCode() == KeyCode.DOWN) {
                 event.consume();
                 selectSuggestion(selectedIndex + 1);
-            } else if (event.getCode() == KeyCode.TAB) {
+            } else if (event.getCode() == KeyCode.ENTER) {
                 event.consume();
 
                 autocompletePopup.hide();
