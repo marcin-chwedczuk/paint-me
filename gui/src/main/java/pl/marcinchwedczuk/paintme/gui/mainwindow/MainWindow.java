@@ -173,6 +173,7 @@ public class MainWindow implements Initializable {
                 helper.setText(change.getControlNewText());
                 helper.setWrappingWidth(textPreview.getLayoutBounds().getWidth());
                 helper.setTextOrigin(VPos.TOP);
+                // TODO: Use Gray smoothing, disable image antialiasing when drawing text Image
                 helper.setFontSmoothingType(FontSmoothingType.LCD);
                 helper.setBoundsType(TextBoundsType.LOGICAL_VERTICAL_CENTER);
 

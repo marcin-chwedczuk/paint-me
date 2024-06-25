@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class InMemoryCssStylesheet implements DynamicCssProvider {
     private static final String NO_CSS = "/* nothing */";
 
-    private static volatile String contents = NO_CSS;
+    private static String contents = NO_CSS;
     private static final AtomicInteger cacheBuster = new AtomicInteger(10000);
 
     @Override

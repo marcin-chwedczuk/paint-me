@@ -74,6 +74,8 @@ public class CssTool implements Initializable {
     private ListView<String> autocompleteList = new ListView<>();
     private Popup autocomplete = new Popup();
 
+    // TODO: Split into several classes
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         System.out.println("INITIALIZING CSS TOOL");
@@ -167,18 +169,21 @@ public class CssTool implements Initializable {
                     } else {
                         autocompleteList.getSelectionModel().select(Math.max(0, autocompleteList.getSelectionModel().getSelectedIndex() - 1));
                     }
+                    event.consume();
                 } else if (event.getCode() == KeyCode.DOWN) {
                     if (selected == -1) {
                         autocompleteList.getSelectionModel().select(0);
                     } else {
                         autocompleteList.getSelectionModel().select(Math.min(autocompleteList.getItems().size()-1, autocompleteList.getSelectionModel().getSelectedIndex() + 1));
                     }
+                    event.consume();
                 } else if (event.getCode() == KeyCode.TAB) {
                     autocomplete.hide();
                     if (selected != -1) {
                         String autocompletedText = autocompleteList.getSelectionModel().getSelectedItem();
                         cssText.insertText(cssText.getCaretPosition(), "AUTO:" + autocompletedText);
                     }
+                    event.consume();
                 }
             }
         });
@@ -248,6 +253,7 @@ public class CssTool implements Initializable {
     private void fillControlStructure(Control control) {
         controlStructure.setRoot(null);
 
+        // TODO: Unsubscribe later
         control.skinProperty().addListener(o -> {
             Platform.runLater(() -> {
                 TreeItem<String> root = new TreeItem<>();
