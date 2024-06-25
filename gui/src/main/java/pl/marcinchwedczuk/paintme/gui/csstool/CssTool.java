@@ -8,6 +8,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -19,6 +20,8 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Scale;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
+import javafx.util.StringConverter;
 import pl.marcinchwedczuk.paintme.gui.util.ExceptionUtil;
 
 import java.io.IOException;
@@ -29,14 +32,15 @@ public class CssTool implements Initializable {
     public static CssTool showOn(Stage window) {
         try {
             FXMLLoader loader = new FXMLLoader(CssTool.class.getResource("CssTool.fxml"));
-
             Scene scene = new Scene(loader.load());
+
             CssTool controller = (CssTool) loader.getController();
 
             window.setTitle("CSS Tool");
             window.setScene(scene);
             window.setResizable(true);
 
+            window.setOnShown(controller::onWindowShown);
             window.show();
 
             return controller;
@@ -44,6 +48,7 @@ public class CssTool implements Initializable {
             throw new RuntimeException(e);
         }
     }
+
 
     @FXML
     private AutocompleteTextArea cssText;
@@ -72,6 +77,9 @@ public class CssTool implements Initializable {
 
     @FXML
     private Rectangle statusIcon;
+
+    @FXML
+    private TextField extraClasses;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -109,6 +117,11 @@ public class CssTool implements Initializable {
         });
     }
 
+    private void onWindowShown(WindowEvent e) {
+    }
+
+    private ChangeListener<String> extraClassesTextChangeListener = null;
+
     private void installControl(String controlClassName) throws Exception {
         Class<?> controlClass = Class.forName(controlClassName);
         Control control = (Control) controlClass.newInstance();
@@ -141,6 +154,15 @@ public class CssTool implements Initializable {
 
         htmlHelpViewerWrapper.showHelpFor(controlClass);
 
+        extraClasses.setText(String.join(" ", control.getStyleClass()));
+        extraClassesTextChangeListener = (e, oldValue, newValue) -> {
+            control.getStyleClass().clear();
+            if (newValue != null) {
+                control.getStyleClass().addAll(newValue.split(" "));
+            }
+        };
+        extraClasses.textProperty().addListener(extraClassesTextChangeListener);
+
         statusIcon.setFill(Color.YELLOW);
     }
 
@@ -164,6 +186,10 @@ public class CssTool implements Initializable {
         if (zoomListenerForBounds != null) {
             controlContainer.layoutBoundsProperty().removeListener(zoomListenerForBounds);
         }
+
+        if (extraClassesTextChangeListener != null) {
+            extraClasses.textProperty().removeListener(extraClassesTextChangeListener);
+        }
     }
 
     private ChangeListener<Bounds> zoomListenerForBounds = null;
@@ -183,7 +209,7 @@ public class CssTool implements Initializable {
 
         Platform.runLater(() -> {
             // manually fire once - layoutBounds will not change until container is resized.
-            // WARNING: Needs to run later. TODO: Figure out why...
+            // TODO: This delay is not enough, wait on either skin prop or on some other prop
             zoomListenerForBounds.changed(null, null, null);
         });
     }
