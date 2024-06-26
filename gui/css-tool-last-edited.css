@@ -1,2 +1,8 @@
-.foo { }
-.bar { }
+.button {
+
+    -fx-background-image: url("/icons/css-tool/go-previous.png");
+    -fx-background-size: contain; /* or specify the size you need */
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: left;
+	-fx-padding: 4 4 4 28px;
+}

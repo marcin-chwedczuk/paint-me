@@ -1,16 +1,39 @@
 package pl.marcinchwedczuk.paintme.gui.csstool;
 
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
+import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEvent;
 import javafx.scene.web.WebView;
 
-public class HtmlHelpViewerWrapper {
-    private final WebView webView;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ResourceBundle;
 
-    public HtmlHelpViewerWrapper(WebView webView) {
-        this.webView = webView;
+public class HtmlHelpViewer extends VBox implements Initializable {
+    @FXML
+    private WebView webView;
+
+    public HtmlHelpViewer() {
+        // TODO: Remove duplication across project
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(
+                "HtmlHelpViewer.fxml"));
+        fxmlLoader.setRoot(this);
+        fxmlLoader.setController(this);
+
+        // Hack for scene builder "xxx.fxml file not found" error.
+        fxmlLoader.setClassLoader(getClass().getClassLoader());
+
+        try {
+            fxmlLoader.load();
+        } catch (IOException exception) {
+            throw new RuntimeException(exception);
+        }
     }
 
-    public void initialize() {
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
         webView.getEngine().load(getClass().getResource("javafx-css-docs.html").toExternalForm());
         webView.setContextMenuEnabled(false);
 
@@ -29,6 +52,4 @@ public class HtmlHelpViewerWrapper {
 
         webView.getEngine().executeScript("{ var el = document.getElementById('" + controlClass.getSimpleName().toLowerCase() + "'); if (el) el.scrollIntoView(); }");
     }
-
-    // TODO: Add go to table of contents option
 }

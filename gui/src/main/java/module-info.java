@@ -17,7 +17,6 @@ module pl.marcinchwedczuk.paintme.gui {
     exports pl.marcinchwedczuk.paintme.gui.extra;
     exports pl.marcinchwedczuk.paintme.gui.dynamiccss;
     exports pl.marcinchwedczuk.paintme.gui.csstool;
-    exports icons;
 
     // Allow @FXML injection to private fields.
     opens pl.marcinchwedczuk.paintme.gui.mainwindow;
@@ -26,7 +25,6 @@ module pl.marcinchwedczuk.paintme.gui {
     opens pl.marcinchwedczuk.paintme.gui.extra;
     opens pl.marcinchwedczuk.paintme.gui.dynamiccss;
     opens pl.marcinchwedczuk.paintme.gui.csstool;
-    opens icons;
 
     provides java.net.spi.URLStreamHandlerProvider with pl.marcinchwedczuk.paintme.gui.ClasspathURLStreamHandlerProvider;
 }

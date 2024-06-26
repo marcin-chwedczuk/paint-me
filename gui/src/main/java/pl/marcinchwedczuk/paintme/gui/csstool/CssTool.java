@@ -8,7 +8,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
-import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -18,17 +17,14 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Scale;
-import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import javafx.util.StringConverter;
 import pl.marcinchwedczuk.paintme.gui.util.ExceptionUtil;
 
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.OpenOption;
 import java.nio.file.Paths;
 import java.util.*;
 
@@ -57,14 +53,11 @@ public class CssTool implements Initializable {
         }
     }
 
-
-
     @FXML
     private AutocompleteTextArea cssText;
 
     @FXML
-    private WebView htmlHelpViewer;
-    private HtmlHelpViewerWrapper htmlHelpViewerWrapper;
+    private HtmlHelpViewer htmlHelpViewer;
 
     @FXML
     private ComboBox<String> selectedControl;
@@ -93,9 +86,6 @@ public class CssTool implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         System.out.println("INITIALIZING CSS TOOL");
-
-        htmlHelpViewerWrapper = new HtmlHelpViewerWrapper(htmlHelpViewer);
-        htmlHelpViewerWrapper.initialize();
 
         List<String> controlClassNames = JavaFxControlClassesFinder.findControlClasses().stream()
                 .map(Class::getName)
@@ -183,7 +173,7 @@ public class CssTool implements Initializable {
                         .toList();
         cssText.setSuggestions(cssPropsNames);
 
-        htmlHelpViewerWrapper.showHelpFor(controlClass);
+        htmlHelpViewer.showHelpFor(controlClass);
 
         extraClasses.setText(String.join(" ", control.getStyleClass()));
         extraClassesTextChangeListener = (e, oldValue, newValue) -> {
