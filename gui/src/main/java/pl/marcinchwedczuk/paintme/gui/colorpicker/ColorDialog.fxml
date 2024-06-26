@@ -10,6 +10,7 @@
 <?import javafx.scene.canvas.Canvas?>
 <?import pl.marcinchwedczuk.paintme.gui.colorpicker.ColorPicker?>
 <?import javafx.scene.shape.Rectangle?>
+<?import pl.marcinchwedczuk.paintme.gui.colorpicker.NumberTextField?>
 <HBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="pl.marcinchwedczuk.paintme.gui.colorpicker.ColorDialog"
@@ -70,22 +71,22 @@
             </VBox>
 
             <Label GridPane.rowIndex="0" GridPane.columnIndex="1" mnemonicParsing="true">Hu_e</Label>
-            <TextField GridPane.rowIndex="0" GridPane.columnIndex="2" />
+            <NumberTextField GridPane.rowIndex="0" GridPane.columnIndex="2" fx:id="hueTextField" />
 
             <Label GridPane.rowIndex="0" GridPane.columnIndex="3" mnemonicParsing="true">_Red</Label>
-            <TextField GridPane.rowIndex="0" GridPane.columnIndex="4" />
+            <NumberTextField GridPane.rowIndex="0" GridPane.columnIndex="4" fx:id="redTextField" />
 
             <Label GridPane.rowIndex="1" GridPane.columnIndex="1" mnemonicParsing="true">_Sat</Label>
-            <TextField GridPane.rowIndex="1" GridPane.columnIndex="2" />
+            <NumberTextField GridPane.rowIndex="1" GridPane.columnIndex="2" fx:id="satTextField" />
 
             <Label GridPane.rowIndex="1" GridPane.columnIndex="3" mnemonicParsing="true">_Green</Label>
-            <TextField GridPane.rowIndex="1" GridPane.columnIndex="4" />
+            <NumberTextField GridPane.rowIndex="1" GridPane.columnIndex="4" fx:id="greenTextField" />
 
             <Label GridPane.rowIndex="2" GridPane.columnIndex="1" mnemonicParsing="true">_Lum</Label>
-            <TextField GridPane.rowIndex="2" GridPane.columnIndex="2" />
+            <NumberTextField GridPane.rowIndex="2" GridPane.columnIndex="2" fx:id="lumTextField" />
 
             <Label GridPane.rowIndex="2" GridPane.columnIndex="3" mnemonicParsing="true">Bl_ue</Label>
-            <TextField GridPane.rowIndex="2" GridPane.columnIndex="4" />
+            <NumberTextField GridPane.rowIndex="2" GridPane.columnIndex="4" fx:id="blueTextField" />
         </GridPane>
 
         <Button VBox.vgrow="ALWAYS">_Add to Custom Colors</Button>

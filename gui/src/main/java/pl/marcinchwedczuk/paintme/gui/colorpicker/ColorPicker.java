@@ -2,6 +2,7 @@ package pl.marcinchwedczuk.paintme.gui.colorpicker;
 
 
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -13,8 +14,10 @@ import javafx.scene.transform.Translate;
 
 // Docs: https://learn.microsoft.com/en-us/windows/win32/dlgbox/color-dialog-box
 public class ColorPicker extends HBox {
+    private final SimpleObjectProperty<Color> colorProperty = new SimpleObjectProperty<>(this, "color", Color.AQUA);
 
-    private final SimpleObjectProperty<HslColor> colorProperty = new SimpleObjectProperty<>(this, "color", HslColor.ofRgb(50, 50, 50));
+    // We need this to preserve other params stability when lum hits 0 or 240 (essentially color WHITE or BLACK)
+    private HslColor hslColor = HslColor.ofColor(Color.AQUA);
 
     private final Canvas hueSaturationArea;
     private final Canvas luminanceBar;
@@ -31,48 +34,55 @@ public class ColorPicker extends HBox {
         hueSaturationAreaPane.getStyleClass().add("hue-saturation-area");
 
         luminanceBar = new Canvas();
-        luminanceBar.setWidth(10);
+        luminanceBar.setWidth(12);
         luminanceBar.setHeight(240);
         luminanceBar.setMouseTransparent(true);
 
         triangleLuminancePointer = new Polygon(0, 0, 1, 1, 1, -1);
         triangleLuminancePointer.setMouseTransparent(true);
         Translate moveY = new Translate(0, 0);
-        moveY.yProperty().bind(colorProperty.map(c -> 240 - c.luminosity()));
-        triangleLuminancePointer.getTransforms().addAll(moveY, new Scale(5, 5));
+        moveY.yProperty().bind(colorProperty.map(HslColor::ofColor).map(c -> 240 - c.luminosity()));
+        triangleLuminancePointer.getTransforms().addAll(moveY, new Scale(8, 8));
 
         var luminanceBarAreaPane = new HBox(luminanceBar, triangleLuminancePointer);
         luminanceBarAreaPane.getStyleClass().add("luminance-area");
 
         getChildren().addAll(hueSaturationAreaPane, luminanceBarAreaPane);
 
-        redrawHueSaturationArea(120, 120);
-        redrawLuminanceBar();
-
         hueSaturationArea.setOnMouseClicked(e -> {
-            int x = (int) Math.round(e.getX());
-            int y = (int) Math.round(e.getY());
+            int x = (int) e.getX();
+            int y = (int) e.getY();
 
-            int hue = Math.clamp(x, 0, 239);
-            int saturation = Math.clamp(240 - y, 0, 240);
+            int hue = Math.clamp(x, HslColor.MIN_HUE, HslColor.MAX_HUE);
+            int saturation = Math.clamp(240 - y, HslColor.MIN_SATURATION, HslColor.MAX_SATURATION);
 
-            HslColor currentColor = colorProperty.get();
-            HslColor newColor = currentColor.withHue(hue).withSaturation(saturation);
-            colorProperty.set(newColor);
-
-            redrawHueSaturationArea(x, y);
-            redrawLuminanceBar();
+            hslColor = hslColor.withHue(hue).withSaturation(saturation);
+            colorProperty.set(hslColor.toColor());
         });
 
         luminanceBarAreaPane.setOnMouseClicked(e -> {
-            int y = (int) Math.round(e.getY());
+            int y = (int) e.getY();
 
-            int luminance = Math.clamp(240 - y, 0, 240);
+            int luminance = Math.clamp(240 - y, HslColor.MIN_LUMINOSITY, HslColor.MAX_LUMINOSITY);
 
-            HslColor currentColor = colorProperty.get();
-            HslColor newColor = currentColor.withLuminosity(luminance);
-            colorProperty.set(newColor);
+            hslColor = hslColor.withLuminosity(luminance);
+            colorProperty.set(hslColor.toColor());
         });
+
+        colorProperty.addListener((e) -> {
+            redrawPickerAreas();
+        });
+
+        // Initial draw
+        redrawPickerAreas();
+    }
+
+    private void redrawPickerAreas() {
+        int x = hslColor.hue();
+        int y = HslColor.MAX_SATURATION - hslColor.saturation();
+
+        redrawHueSaturationArea(x, y);
+        redrawLuminanceBar();
     }
 
     private void redrawHueSaturationArea(int clickX, int clickY) {
@@ -112,16 +122,22 @@ public class ColorPicker extends HBox {
         GraphicsContext c2d = luminanceBar.getGraphicsContext2D();
         double w = luminanceBar.getWidth();
 
-        HslColor color = colorProperty.get();
-
         int step = 8;
         for (int lum = 0; lum <= 240; lum += step) {
-            c2d.setFill(color.withLuminosity(240 - lum).toColor());
+            c2d.setFill(hslColor.withLuminosity(240 - lum).toColor());
             c2d.fillRect(0, lum, w, step);
         }
     }
 
-    public ObjectProperty<HslColor> colorProperty() {
+    public ReadOnlyObjectProperty<Color> colorProperty() {
         return this.colorProperty;
+    }
+
+    public Color getColor() {
+        return colorProperty().get();
+    }
+
+    public HslColor getHslColor() {
+        return hslColor;
     }
 }
