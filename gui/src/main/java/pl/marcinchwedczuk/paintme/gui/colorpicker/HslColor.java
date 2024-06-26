@@ -10,15 +10,31 @@ import static java.lang.Math.min;
  * Based on Wine: https://source.winehq.org/source/dlls/shlwapi/ordinal.c
  */
 public class HslColor {
-    public static int MIN_VALUE = 0;
-    public static int MAX_VALUE = 240;
+    // In the Color dialog box, the saturation and luminosity values must be in the range 0 through 240, and the hue value must be in the range 0 through 239.
+    // https://learn.microsoft.com/pl-pl/windows/win32/dlgbox/color-dialog-box?redirectedfrom=MSDN
 
-    public static HslColor ofHsl(int hue, int saturation, int luminance) {
-        return new HslColor(hue, luminance, saturation);
+    public static final int MIN_HUE = 0;
+    public static final int MAX_HUE = 239;
+
+    public static final int MIN_SATURATION = 0;
+    public static final int MAX_SATURATION = 240;
+
+    public static final int MIN_LUMINOSITY = 0;
+    public static final int MAX_LUMINOSITY = 240;
+
+    public static HslColor ofHsl(int hue, int saturation, int luminosity) {
+        return new HslColor(hue, luminosity, saturation);
     }
 
     public static HslColor ofColor(Color color) {
-        return ofRgb((int)(color.getRed()*255), (int)(color.getGreen()), (int)(color.getBlue()));
+        return ofRgb(
+                toIntComponent(color.getRed()),
+                toIntComponent(color.getGreen()),
+                toIntComponent(color.getBlue()));
+    }
+
+    private static int toIntComponent(double component) {
+        return Math.clamp((int)Math.round(component * 255.0), 0, 255);
     }
 
     public static HslColor ofRgb(int wR, int wG, int wB) {
@@ -68,15 +84,21 @@ public class HslColor {
     }
 
     private final int hue;
-    private final int luminance;
+    private final int luminosity;
     private final int saturation;
 
-    public HslColor(int hue, int luminance, int saturation) {
-        // TODO Validate ranges
-        // In the Color dialog box, the saturation and luminosity values must be in the range 0 through 240, and the hue value must be in the range 0 through 239.
-        // https://learn.microsoft.com/pl-pl/windows/win32/dlgbox/color-dialog-box?redirectedfrom=MSDN
+    public HslColor(int hue, int luminosity, int saturation) {
+        if (hue < MIN_HUE || hue > MAX_HUE)
+            throw new IllegalArgumentException("hue");
+
+        if (luminosity < MIN_LUMINOSITY || luminosity > MAX_LUMINOSITY)
+            throw new IllegalArgumentException("luminosity");
+
+        if (saturation < MIN_SATURATION || saturation > MAX_SATURATION)
+            throw new IllegalArgumentException("saturation");
+
         this.hue = hue;
-        this.luminance = luminance;
+        this.luminosity = luminosity;
         this.saturation = saturation;
     }
 
@@ -85,15 +107,15 @@ public class HslColor {
     }
 
     public HslColor withHue(int newHue) {
-        return HslColor.ofHsl(newHue, saturation, luminance);
+        return HslColor.ofHsl(newHue, saturation, luminosity);
     }
 
-    public int luminance() {
-        return luminance;
+    public int luminosity() {
+        return luminosity;
     }
 
-    public HslColor withLuminance(int newLuminance) {
-        return HslColor.ofHsl(hue, saturation, newLuminance);
+    public HslColor withLuminosity(int newLuminosity) {
+        return HslColor.ofHsl(hue, saturation, newLuminosity);
     }
 
     public int saturation() {
@@ -101,20 +123,20 @@ public class HslColor {
     }
 
     public HslColor withSaturation(int newSaturation) {
-        return HslColor.ofHsl(hue, newSaturation, luminance);
+        return HslColor.ofHsl(hue, newSaturation, luminosity);
     }
 
-    private static int convertHue(int wHue, int wMid1, int wMid2) {
-        wHue = wHue > 240 ? wHue - 240 : wHue < 0 ? wHue + 240 : wHue;
+    private static int convertHue(int hue, int mid1, int mid2) {
+        hue = hue > 240 ? hue - 240 : hue < 0 ? hue + 240 : hue;
 
-        if (wHue > 160)
-            return wMid1;
-        else if (wHue > 120)
-            wHue = 160 - wHue;
-        else if (wHue > 40)
-            return wMid2;
+        if (hue > 160)
+            return mid1;
+        else if (hue > 120)
+            hue = 160 - hue;
+        else if (hue > 40)
+            return mid2;
 
-        return ((wHue * (wMid2 - wMid1) + 20) / 40) + wMid1;
+        return ((hue * (mid2 - mid1) + 20) / 40) + mid1;
     }
 
     private static int getRgb(int h, int mid1, int mid2) {
@@ -122,26 +144,24 @@ public class HslColor {
     }
 
     public Color toColor() {
-        int wRed;
+        int red, green, blue, mid1, mid2;
 
         if (saturation != 0) {
-            int wGreen, wBlue, wMid1, wMid2;
-
-            if (luminance > 120)
-                wMid2 = saturation + luminance - (saturation * luminance + 120) / 240;
+            if (luminosity > 120)
+                mid2 = saturation + luminosity - (saturation * luminosity + 120) / 240;
             else
-                wMid2 = ((saturation + 240) * luminance + 120) / 240;
+                mid2 = ((saturation + 240) * luminosity + 120) / 240;
 
-            wMid1 = luminance * 2 - wMid2;
+            mid1 = luminosity * 2 - mid2;
 
-            wRed   = getRgb(hue + 80, wMid1, wMid2);
-            wGreen = getRgb(hue, wMid1, wMid2);
-            wBlue  = getRgb(hue - 80, wMid1, wMid2);
+            red   = getRgb(hue + 80, mid1, mid2);
+            green = getRgb(hue, mid1, mid2);
+            blue  = getRgb(hue - 80, mid1, mid2);
 
-            return Color.rgb(wRed, wGreen, wBlue);
+            return Color.rgb(red, green, blue);
         }
 
-        wRed = luminance * 255 / 240;
-        return Color.rgb(wRed, wRed, wRed);
+        red = luminosity * 255 / 240;
+        return Color.rgb(red, red, red);
     }
 }

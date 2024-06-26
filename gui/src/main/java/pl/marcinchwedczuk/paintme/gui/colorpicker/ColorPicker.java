@@ -38,7 +38,7 @@ public class ColorPicker extends HBox {
         triangleLuminancePointer = new Polygon(0, 0, 1, 1, 1, -1);
         triangleLuminancePointer.setMouseTransparent(true);
         Translate moveY = new Translate(0, 0);
-        moveY.yProperty().bind(colorProperty.map(c -> 240 - c.luminance()));
+        moveY.yProperty().bind(colorProperty.map(c -> 240 - c.luminosity()));
         triangleLuminancePointer.getTransforms().addAll(moveY, new Scale(5, 5));
 
         var luminanceBarAreaPane = new HBox(luminanceBar, triangleLuminancePointer);
@@ -70,7 +70,7 @@ public class ColorPicker extends HBox {
             int luminance = Math.clamp(240 - y, 0, 240);
 
             HslColor currentColor = colorProperty.get();
-            HslColor newColor = currentColor.withLuminance(luminance);
+            HslColor newColor = currentColor.withLuminosity(luminance);
             colorProperty.set(newColor);
         });
     }
@@ -116,7 +116,7 @@ public class ColorPicker extends HBox {
 
         int step = 8;
         for (int lum = 0; lum <= 240; lum += step) {
-            c2d.setFill(color.withLuminance(240 - lum).toColor());
+            c2d.setFill(color.withLuminosity(240 - lum).toColor());
             c2d.fillRect(0, lum, w, step);
         }
     }
