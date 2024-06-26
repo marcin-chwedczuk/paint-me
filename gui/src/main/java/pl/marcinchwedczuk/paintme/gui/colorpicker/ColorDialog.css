@@ -1,0 +1,26 @@
+.color-radio-container > .radio-button > .radio {
+    -fx-background-radius: 0;
+    -fx-background-color: yellow; // change color here
+
+    -fx-border-color: gray white white gray, black darkgray darkgray black;
+    -fx-border-insets:  0, 1;
+}
+
+.color-radio-container > .radio-button:focused > .radio {
+    -fx-border-color: gray white white gray, black darkgray darkgray black, black;
+    -fx-border-style: solid, solid, segments(1, 1);
+    -fx-border-insets:  0, 1, -3;
+}
+
+.color-radio-container > .radio-button:selected > .radio > .dot {
+    -fx-background-color: unset;
+
+    -fx-border-width: 1px;
+    -fx-border-color: black;
+    -fx-border-insets: -7px;
+    -fx-border-style:  solid;
+}
+
+.color-radio-container {
+    -fx-background-color: white;
+}

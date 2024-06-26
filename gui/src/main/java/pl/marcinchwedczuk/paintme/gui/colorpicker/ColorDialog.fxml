@@ -9,13 +9,85 @@
 <?import javafx.scene.text.Text?>
 <?import javafx.scene.canvas.Canvas?>
 <?import pl.marcinchwedczuk.paintme.gui.colorpicker.ColorPicker?>
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="pl.marcinchwedczuk.paintme.gui.colorpicker.ColorDialog"
-            prefHeight="400.0" prefWidth="600.0">
-    <Pane>
+<?import javafx.scene.shape.Rectangle?>
+<HBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="pl.marcinchwedczuk.paintme.gui.colorpicker.ColorDialog"
+      prefHeight="400.0" prefWidth="600.0"
+      stylesheets="@ColorDialog.css">
+    <!-- Color Boxes -->
+    <VBox>
+        <fx:define>
+            <ToggleGroup fx:id="colorToggleGroup" />
+        </fx:define>
+        <Label mnemonicParsing="true">_Basic colors:</Label>
+        <TilePane fx:id="predefinedColors" styleClass="color-radio-container">
+            <RadioButton />
+            <RadioButton />
+            <RadioButton />
+            <RadioButton />
+            <RadioButton />
+            <RadioButton />
+        </TilePane>
+
+        <Label mnemonicParsing="true">_Custom colors:</Label>
+        <TilePane fx:id="customColors" styleClass="color-radio-container">
+            <RadioButton />
+            <RadioButton />
+            <RadioButton />
+            <RadioButton />
+            <RadioButton />
+        </TilePane>
+
+        <Button VBox.vgrow="ALWAYS">_Define Custom Colors &gt;&gt;</Button>
+        <HBox>
+            <Button>OK</Button>
+            <Button>Cancel</Button>
+        </HBox>
+    </VBox>
+
+    <!-- Expandable Color Picker -->
+    <VBox>
         <ColorPicker />
-        <AnchorPane.topAnchor>10</AnchorPane.topAnchor>
-        <AnchorPane.leftAnchor>10</AnchorPane.leftAnchor>
-    </Pane>
-</AnchorPane>
+
+        <GridPane>
+            <columnConstraints>
+                <ColumnConstraints />
+                <ColumnConstraints />
+                <ColumnConstraints />
+                <ColumnConstraints />
+                <ColumnConstraints />
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints />
+                <RowConstraints />
+                <RowConstraints />
+            </rowConstraints>
+
+            <VBox GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.rowSpan="3">
+                <Rectangle width="100" height="80" fill="aqua" />
+                <Label mnemonicParsing="true">Color|S_olid</Label>
+            </VBox>
+
+            <Label GridPane.rowIndex="0" GridPane.columnIndex="1" mnemonicParsing="true">Hu_e</Label>
+            <TextField GridPane.rowIndex="0" GridPane.columnIndex="2" />
+
+            <Label GridPane.rowIndex="0" GridPane.columnIndex="3" mnemonicParsing="true">_Red</Label>
+            <TextField GridPane.rowIndex="0" GridPane.columnIndex="4" />
+
+            <Label GridPane.rowIndex="1" GridPane.columnIndex="1" mnemonicParsing="true">_Sat</Label>
+            <TextField GridPane.rowIndex="1" GridPane.columnIndex="2" />
+
+            <Label GridPane.rowIndex="1" GridPane.columnIndex="3" mnemonicParsing="true">_Green</Label>
+            <TextField GridPane.rowIndex="1" GridPane.columnIndex="4" />
+
+            <Label GridPane.rowIndex="2" GridPane.columnIndex="1" mnemonicParsing="true">_Lum</Label>
+            <TextField GridPane.rowIndex="2" GridPane.columnIndex="2" />
+
+            <Label GridPane.rowIndex="2" GridPane.columnIndex="3" mnemonicParsing="true">Bl_ue</Label>
+            <TextField GridPane.rowIndex="2" GridPane.columnIndex="4" />
+        </GridPane>
+
+        <Button VBox.vgrow="ALWAYS">_Add to Custom Colors</Button>
+    </VBox>
+</HBox>

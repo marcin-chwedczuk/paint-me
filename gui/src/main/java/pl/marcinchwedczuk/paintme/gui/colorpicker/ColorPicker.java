@@ -26,10 +26,6 @@ public class ColorPicker extends HBox {
     private final Polygon triangleLuminancePointer;
 
     public ColorPicker() {
-        String css = getClass().getResource("ColorPicker.css").toExternalForm();
-        System.out.println("CSS: " + css);
-        getStylesheets().add(css);
-
         hueSaturationArea = new Canvas();
         hueSaturationArea.setWidth(239);
         hueSaturationArea.setHeight(240);
@@ -40,18 +36,16 @@ public class ColorPicker extends HBox {
 
         var sniperMark = new Group(
                 // top
-                new Rectangle(-halfSS, -halfSS - 3*sniperSize, sniperSize, sniperSize*2),
+                new Rectangle(-halfSS, -halfSS - 3 * sniperSize, sniperSize, sniperSize * 2),
 
                 // bottom
-                new Rectangle(-halfSS, halfSS + sniperSize, sniperSize, sniperSize*2),
+                new Rectangle(-halfSS, halfSS + sniperSize, sniperSize, sniperSize * 2),
 
                 // left
-                new Rectangle(-3*sniperSize - halfSS, -halfSS, 2*sniperSize, sniperSize),
+                new Rectangle(-3 * sniperSize - halfSS, -halfSS, 2 * sniperSize, sniperSize),
 
                 // right
-                new Rectangle(sniperSize + halfSS, -halfSS, 2*sniperSize, sniperSize)
-
-                ,new Rectangle(-1, -1, 2, 2)
+                new Rectangle(sniperSize + halfSS, -halfSS, 2 * sniperSize, sniperSize)
         );
 
         Translate sniperMarkTranslation = new Translate(0, 0);
@@ -67,18 +61,7 @@ public class ColorPicker extends HBox {
 
         triangleLuminancePointer = new Polygon(0, 0, 1, 1, 1, -1);
 
-
-        var rb =  new RadioButton();
-        rb.getStyleClass().add("color-radio");
-
-        var rb2 =  new RadioButton();
-        rb2.getStyleClass().add("color-radio");
-
-        var tmp = new HBox(
-               rb, rb2
-        );
-
-        getChildren().addAll(tmp, hueSaturationAreaPane, luminanceBar, triangleLuminancePointer);
+        getChildren().addAll(hueSaturationAreaPane, luminanceBar, triangleLuminancePointer);
 
         redrawHueSaturationArea(120, 120);
         redrawLuminanceBar();
@@ -88,8 +71,8 @@ public class ColorPicker extends HBox {
         triangleLuminancePointer.getTransforms().addAll(moveY, new Scale(5, 5));
 
         hueSaturationArea.setOnMouseClicked(e -> {
-             int x = (int)Math.round(e.getX());
-             int y = (int)Math.round(e.getY());
+            int x = (int) Math.round(e.getX());
+            int y = (int) Math.round(e.getY());
 
             int hue = Math.clamp(x, 0, 239);
             int saturation = Math.clamp(240 - y, 0, 240);
@@ -103,7 +86,7 @@ public class ColorPicker extends HBox {
         });
 
         luminanceBar.setOnMouseClicked(e -> {
-            int y = (int)Math.round(e.getY());
+            int y = (int) Math.round(e.getY());
 
             int luminance = Math.clamp(240 - y, 0, 240);
 
@@ -134,13 +117,13 @@ public class ColorPicker extends HBox {
 
         c2d.setFill(Color.BLACK);
         // top
-        c2d.fillRect(clickX -halfSS, clickY-halfSS - 3*sniperSize, sniperSize, sniperSize*2);
-                // bottom
-        c2d.fillRect(clickX -halfSS, clickY + halfSS + sniperSize, sniperSize, sniperSize*2);
-                // left
-        c2d.fillRect(clickX -3*sniperSize - halfSS, clickY-halfSS, 2*sniperSize, sniperSize);
+        c2d.fillRect(clickX - halfSS, clickY - halfSS - 3 * sniperSize, sniperSize, sniperSize * 2);
+        // bottom
+        c2d.fillRect(clickX - halfSS, clickY + halfSS + sniperSize, sniperSize, sniperSize * 2);
+        // left
+        c2d.fillRect(clickX - 3 * sniperSize - halfSS, clickY - halfSS, 2 * sniperSize, sniperSize);
         // right
-        c2d.fillRect(clickX + sniperSize + halfSS, clickY-halfSS, 2*sniperSize, sniperSize);
+        c2d.fillRect(clickX + sniperSize + halfSS, clickY - halfSS, 2 * sniperSize, sniperSize);
     }
 
     private void redrawLuminanceBar() {
