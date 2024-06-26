@@ -28,8 +28,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 
-import static java.nio.file.StandardOpenOption.CREATE;
-import static java.nio.file.StandardOpenOption.WRITE;
+import static java.nio.file.StandardOpenOption.*;
 
 public class CssTool implements Initializable {
     public static CssTool showOn(Stage window) {
@@ -125,7 +124,7 @@ public class CssTool implements Initializable {
     /// TODO: Extract to a sepratate module for preserving last state
     private void onWindowClose(WindowEvent windowEvent) {
         try {
-            Files.writeString(Paths.get("css-tool-last-edited.css"), cssText.getText(), StandardCharsets.UTF_8, WRITE, CREATE);
+            Files.writeString(Paths.get("css-tool-last-edited.css"), cssText.getText(), StandardCharsets.UTF_8, WRITE, CREATE, TRUNCATE_EXISTING);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -12,7 +12,7 @@
            stylesheets="@CssTool.css">
 
     <SplitPane orientation="VERTICAL">
-        <AutocompleteTextArea fx:id="cssText" />
+        <AutocompleteTextArea fx:id="cssText" styleClass="css-code" />
         <HtmlHelpViewer fx:id="htmlHelpViewer" />
     </SplitPane>
 
