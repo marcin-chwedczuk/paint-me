@@ -1,6 +1,7 @@
 package pl.marcinchwedczuk.paintme.gui.colorpicker;
 
 
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -26,22 +27,27 @@ public class ColorPicker extends HBox {
         hueSaturationArea.setWidth(239);
         hueSaturationArea.setHeight(240);
 
-        var hueSaturationAreaPane = new StackPane(hueSaturationArea);
+        var hueSaturationAreaPane = new Pane(hueSaturationArea);
+        hueSaturationAreaPane.getStyleClass().add("hue-saturation-area");
 
         luminanceBar = new Canvas();
         luminanceBar.setWidth(10);
         luminanceBar.setHeight(240);
+        luminanceBar.setMouseTransparent(true);
 
         triangleLuminancePointer = new Polygon(0, 0, 1, 1, 1, -1);
-
-        getChildren().addAll(hueSaturationAreaPane, luminanceBar, triangleLuminancePointer);
-
-        redrawHueSaturationArea(120, 120);
-        redrawLuminanceBar();
-
+        triangleLuminancePointer.setMouseTransparent(true);
         Translate moveY = new Translate(0, 0);
         moveY.yProperty().bind(colorProperty.map(c -> 240 - c.luminance()));
         triangleLuminancePointer.getTransforms().addAll(moveY, new Scale(5, 5));
+
+        var luminanceBarAreaPane = new HBox(luminanceBar, triangleLuminancePointer);
+        luminanceBarAreaPane.getStyleClass().add("luminance-area");
+
+        getChildren().addAll(hueSaturationAreaPane, luminanceBarAreaPane);
+
+        redrawHueSaturationArea(120, 120);
+        redrawLuminanceBar();
 
         hueSaturationArea.setOnMouseClicked(e -> {
             int x = (int) Math.round(e.getX());
@@ -58,12 +64,11 @@ public class ColorPicker extends HBox {
             redrawLuminanceBar();
         });
 
-        luminanceBar.setOnMouseClicked(e -> {
+        luminanceBarAreaPane.setOnMouseClicked(e -> {
             int y = (int) Math.round(e.getY());
 
             int luminance = Math.clamp(240 - y, 0, 240);
 
-            System.out.println("LUMINANCE: " + luminance);
             HslColor currentColor = colorProperty.get();
             HslColor newColor = currentColor.withLuminance(luminance);
             colorProperty.set(newColor);
@@ -114,5 +119,9 @@ public class ColorPicker extends HBox {
             c2d.setFill(color.withLuminance(240 - lum).toColor());
             c2d.fillRect(0, lum, w, step);
         }
+    }
+
+    public ObjectProperty<HslColor> colorProperty() {
+        return this.colorProperty;
     }
 }

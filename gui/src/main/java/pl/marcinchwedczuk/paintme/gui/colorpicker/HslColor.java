@@ -17,6 +17,10 @@ public class HslColor {
         return new HslColor(hue, luminance, saturation);
     }
 
+    public static HslColor ofColor(Color color) {
+        return ofRgb((int)(color.getRed()*255), (int)(color.getGreen()), (int)(color.getBlue()));
+    }
+
     public static HslColor ofRgb(int wR, int wG, int wB) {
         int wMax, wMin;
         int wHue, wLuminosity, wSaturation;

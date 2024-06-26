@@ -48,7 +48,7 @@
 
     <!-- Expandable Color Picker -->
     <VBox>
-        <ColorPicker />
+        <ColorPicker fx:id="colorPicker" />
 
         <GridPane>
             <columnConstraints>
@@ -65,7 +65,7 @@
             </rowConstraints>
 
             <VBox GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.rowSpan="3">
-                <Rectangle width="100" height="80" fill="aqua" />
+                <Rectangle fx:id="selectedColorPreview" width="100" height="80" fill="aqua" />
                 <Label mnemonicParsing="true">Color|S_olid</Label>
             </VBox>
 

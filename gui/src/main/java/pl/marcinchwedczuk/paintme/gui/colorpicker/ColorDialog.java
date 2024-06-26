@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -16,6 +17,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class ColorDialog implements Initializable {
+
     public static void showModal(Window owner) {
         try {
             FXMLLoader loader = new FXMLLoader(
@@ -35,8 +37,16 @@ public class ColorDialog implements Initializable {
         }
     }
 
+    @FXML
+    private Rectangle selectedColorPreview;
+
+    @FXML
+    private ColorPicker colorPicker;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         System.out.println("Dialog initialized");
+
+        selectedColorPreview.fillProperty().bind(colorPicker.colorProperty().map(HslColor::toColor));
     }
 }
