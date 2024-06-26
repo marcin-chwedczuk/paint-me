@@ -18,8 +18,8 @@
 
     <SplitPane orientation="VERTICAL">
         <VBox>
-            <HBox VBox.vgrow="NEVER" alignment="BASELINE_LEFT" spacing="2">
-                <ToolBar>
+            <HBox VBox.vgrow="NEVER" alignment="BASELINE_LEFT">
+                <ToolBar HBox.hgrow="ALWAYS">
                     <Label>Control:</Label>
                     <ComboBox fx:id="selectedControl" />
 
@@ -34,15 +34,17 @@
                     <VBox>
                         <BorderPane fx:id="controlContainer" VBox.vgrow="ALWAYS" />
 
-                        <HBox VBox.vgrow="NEVER" alignment="CENTER_LEFT" spacing="2">
-                            <Rectangle fx:id="statusIcon" width="16" height="16" HBox.hgrow="NEVER" />
-                            <Separator orientation="VERTICAL" />
-                            <CheckBox fx:id="controlEnabled" selected="true" text="Enabled" />
+                        <HBox VBox.vgrow="NEVER" alignment="CENTER_LEFT">
+                            <ToolBar HBox.hgrow="ALWAYS">
+                                <Rectangle fx:id="statusIcon" width="16" height="16" />
+                                <Separator orientation="VERTICAL" />
+                                <CheckBox fx:id="controlEnabled" selected="true" text="Enabled" />
+                            </ToolBar>
 
-                            <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS" spacing="2">
+                            <ToolBar HBox.hgrow="NEVER">
                                 <Label labelFor="${zoomSlider}">Zoom:</Label>
                                 <Slider fx:id="zoomSlider" min="1" max="8" value="2" />
-                            </HBox>
+                            </ToolBar>
                         </HBox>
                     </VBox>
                 </Tab>
