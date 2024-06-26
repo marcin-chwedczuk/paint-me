@@ -1,20 +1,14 @@
 package pl.marcinchwedczuk.paintme.gui.colorpicker;
 
 
-import javafx.animation.TranslateTransition;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.RadioButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Scale;
-import javafx.scene.transform.Transform;
 import javafx.scene.transform.Translate;
-import pl.marcinchwedczuk.paintme.gui.extra.BeveledPane;
 
 // Docs: https://learn.microsoft.com/en-us/windows/win32/dlgbox/color-dialog-box
 public class ColorPicker extends HBox {
@@ -26,32 +20,11 @@ public class ColorPicker extends HBox {
     private final Polygon triangleLuminancePointer;
 
     public ColorPicker() {
+        getStyleClass().add("color-picker");
+
         hueSaturationArea = new Canvas();
         hueSaturationArea.setWidth(239);
         hueSaturationArea.setHeight(240);
-
-        int sniperSize = 8;
-        int halfSS = sniperSize / 2;
-        int oneHalfSS = sniperSize + halfSS;
-
-        var sniperMark = new Group(
-                // top
-                new Rectangle(-halfSS, -halfSS - 3 * sniperSize, sniperSize, sniperSize * 2),
-
-                // bottom
-                new Rectangle(-halfSS, halfSS + sniperSize, sniperSize, sniperSize * 2),
-
-                // left
-                new Rectangle(-3 * sniperSize - halfSS, -halfSS, 2 * sniperSize, sniperSize),
-
-                // right
-                new Rectangle(sniperSize + halfSS, -halfSS, 2 * sniperSize, sniperSize)
-        );
-
-        Translate sniperMarkTranslation = new Translate(0, 0);
-        // sniperMarkTranslation.xProperty().bind(colorProperty.map(HslColor::hue));
-        // sniperMarkTranslation.yProperty().bind(colorProperty.map(HslColor::saturation));
-        sniperMark.getTransforms().add(sniperMarkTranslation);
 
         var hueSaturationAreaPane = new StackPane(hueSaturationArea);
 
@@ -100,30 +73,34 @@ public class ColorPicker extends HBox {
     private void redrawHueSaturationArea(int clickX, int clickY) {
         GraphicsContext c2d = hueSaturationArea.getGraphicsContext2D();
 
-        for (int sat = 0; sat <= 240; sat++) {
-            for (int hue = 0; hue <= 239; hue++) {
-                // TODO: Draw 4x4 pixel boxes
+        int step = 4;
+        for (int sat = 0; sat <= 240; sat += step) {
+            for (int hue = 0; hue <= 239; hue += step) {
                 // TODO: Consider using dithering as they do in original Color Picker
-                Color color = HslColor.ofHsl(hue / 4 * 4, sat / 4 * 4, 120).toColor();
+                Color color = HslColor.ofHsl(hue, sat, 120).toColor();
 
                 c2d.setFill(color);
-                c2d.fillRect(hue, 240 - sat, 1, 1);
+                c2d.fillRect(hue, 240 - sat, step, step);
             }
         }
 
+        drawSniperMark(c2d, clickX, clickY);
+    }
 
-        int sniperSize = 4;
-        int halfSS = sniperSize / 2;
+    private static void drawSniperMark(GraphicsContext c2d, int x, int y) {
+        int size = 4;
+        int halfSize = size / 2;
 
         c2d.setFill(Color.BLACK);
+
         // top
-        c2d.fillRect(clickX - halfSS, clickY - halfSS - 3 * sniperSize, sniperSize, sniperSize * 2);
+        c2d.fillRect(x - halfSize, y - halfSize - 3 * size, size, size * 2);
         // bottom
-        c2d.fillRect(clickX - halfSS, clickY + halfSS + sniperSize, sniperSize, sniperSize * 2);
+        c2d.fillRect(x - halfSize, y + halfSize + size, size, size * 2);
         // left
-        c2d.fillRect(clickX - 3 * sniperSize - halfSS, clickY - halfSS, 2 * sniperSize, sniperSize);
+        c2d.fillRect(x - 3 * size - halfSize, y - halfSize, 2 * size, size);
         // right
-        c2d.fillRect(clickX + sniperSize + halfSS, clickY - halfSS, 2 * sniperSize, sniperSize);
+        c2d.fillRect(x + size + halfSize, y - halfSize, 2 * size, size);
     }
 
     private void redrawLuminanceBar() {
