@@ -4,6 +4,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -77,7 +78,6 @@ public class ColorDialog implements Initializable {
                         color -> Integer.toString(color.hue()),
                         (text, oldColor) -> oldColor.withHue(Integer.parseInt(text))));
 
-
         satTextField.setMin(HslColor.MIN_SATURATION);
         satTextField.setMax(HslColor.MAX_SATURATION);
         GenericBidirectionalBinding.bindBidirectional(
@@ -98,12 +98,30 @@ public class ColorDialog implements Initializable {
 
         redTextField.setMin(0);
         redTextField.setMax(255);
+        GenericBidirectionalBinding.bindBidirectional(
+                redTextField.textProperty(),
+                colorPicker.colorProperty(),
+                new ObjectToComponentConverter<>(
+                        color -> Integer.toString((int)Math.round(color.getRed() * 255)),
+                        (text, oldColor) -> Color.color(Integer.parseInt(text) / 255.0, oldColor.getGreen(), oldColor.getBlue())));
 
         greenTextField.setMin(0);
         greenTextField.setMax(255);
+        GenericBidirectionalBinding.bindBidirectional(
+                greenTextField.textProperty(),
+                colorPicker.colorProperty(),
+                new ObjectToComponentConverter<>(
+                        color -> Integer.toString((int)Math.round(color.getGreen() * 255)),
+                        (text, oldColor) -> Color.color(oldColor.getRed(), Integer.parseInt(text) / 255.0, oldColor.getBlue())));
 
         blueTextField.setMin(0);
         blueTextField.setMax(255);
+        GenericBidirectionalBinding.bindBidirectional(
+                blueTextField.textProperty(),
+                colorPicker.colorProperty(),
+                new ObjectToComponentConverter<>(
+                        color -> Integer.toString((int)Math.round(color.getBlue() * 255)),
+                        (text, oldColor) -> Color.color(oldColor.getRed(), oldColor.getGreen(), Integer.parseInt(text) / 255.0)));
     }
 
     private static class ObjectToComponentConverter<TProp, UObj> implements Converter<TProp, UObj> {
