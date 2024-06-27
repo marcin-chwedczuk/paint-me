@@ -19,6 +19,8 @@ public class NumberTextField extends TextField {
         setText(Integer.toString(getMin()));
 
         setTextFormatter(new TextFormatter<>(change -> {
+            if (!change.isContentChange()) return change;
+
             String proposedText = change.getControlNewText();
 
             // Those cause problems with parseInt call.

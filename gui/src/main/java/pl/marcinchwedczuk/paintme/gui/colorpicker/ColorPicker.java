@@ -1,6 +1,7 @@
 package pl.marcinchwedczuk.paintme.gui.colorpicker;
 
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -11,13 +12,14 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import javafx.scene.transform.Scale;
 import javafx.scene.transform.Translate;
+import pl.marcinchwedczuk.paintme.gui.extra.Converter;
+import pl.marcinchwedczuk.paintme.gui.extra.GenericBidirectionalBinding;
 
 // Docs: https://learn.microsoft.com/en-us/windows/win32/dlgbox/color-dialog-box
 public class ColorPicker extends HBox {
+    // HSL is the source of truth
+    private final SimpleObjectProperty<HslColor> hslColorProperty = new SimpleObjectProperty<>(this, "hslColor", HslColor.ofHsl(80, 80, 80));
     private final SimpleObjectProperty<Color> colorProperty = new SimpleObjectProperty<>(this, "color", Color.AQUA);
-
-    // We need this to preserve other params stability when lum hits 0 or 240 (essentially color WHITE or BLACK)
-    private HslColor hslColor = HslColor.ofColor(Color.AQUA);
 
     private final Canvas hueSaturationArea;
     private final Canvas luminanceBar;
@@ -25,6 +27,20 @@ public class ColorPicker extends HBox {
 
     public ColorPicker() {
         getStyleClass().add("color-picker");
+
+        GenericBidirectionalBinding.bindBidirectional(
+                colorProperty, hslColorProperty, new Converter<Color, HslColor>() {
+                    @Override
+                    public Color toFirst(HslColor hslColor) {
+                        return (hslColor != null) ? hslColor.toColor() : null;
+                    }
+
+                    @Override
+                    public HslColor toSecond(Color color) {
+                        return (color != null) ? HslColor.ofColor(color) : null;
+                    }
+                }
+        );
 
         hueSaturationArea = new Canvas();
         hueSaturationArea.setWidth(239);
@@ -56,8 +72,7 @@ public class ColorPicker extends HBox {
             int hue = Math.clamp(x, HslColor.MIN_HUE, HslColor.MAX_HUE);
             int saturation = Math.clamp(240 - y, HslColor.MIN_SATURATION, HslColor.MAX_SATURATION);
 
-            hslColor = hslColor.withHue(hue).withSaturation(saturation);
-            colorProperty.set(hslColor.toColor());
+            setHslColor(getHslColor().withHue(hue).withSaturation(saturation));
         });
 
         luminanceBarAreaPane.setOnMouseClicked(e -> {
@@ -65,11 +80,10 @@ public class ColorPicker extends HBox {
 
             int luminance = Math.clamp(240 - y, HslColor.MIN_LUMINOSITY, HslColor.MAX_LUMINOSITY);
 
-            hslColor = hslColor.withLuminosity(luminance);
-            colorProperty.set(hslColor.toColor());
+            setHslColor(getHslColor().withLuminosity(luminance));
         });
 
-        colorProperty.addListener((e) -> {
+        hslColorProperty().addListener((e) -> {
             redrawPickerAreas();
         });
 
@@ -78,8 +92,8 @@ public class ColorPicker extends HBox {
     }
 
     private void redrawPickerAreas() {
-        int x = hslColor.hue();
-        int y = HslColor.MAX_SATURATION - hslColor.saturation();
+        int x = getHslColor().hue();
+        int y = HslColor.MAX_SATURATION - getHslColor().saturation();
 
         redrawHueSaturationArea(x, y);
         redrawLuminanceBar();
@@ -124,12 +138,12 @@ public class ColorPicker extends HBox {
 
         int step = 8;
         for (int lum = 0; lum <= 240; lum += step) {
-            c2d.setFill(hslColor.withLuminosity(240 - lum).toColor());
+            c2d.setFill(getHslColor().withLuminosity(240 - lum).toColor());
             c2d.fillRect(0, lum, w, step);
         }
     }
 
-    public ReadOnlyObjectProperty<Color> colorProperty() {
+    public ObjectProperty<Color> colorProperty() {
         return this.colorProperty;
     }
 
@@ -137,7 +151,19 @@ public class ColorPicker extends HBox {
         return colorProperty().get();
     }
 
+    public void setColor(Color c) {
+        colorProperty().set(c);
+    }
+
+    public ObjectProperty<HslColor> hslColorProperty() {
+        return this.hslColorProperty;
+    }
+
     public HslColor getHslColor() {
-        return hslColor;
+        return hslColorProperty().get();
+    }
+
+    public void setHslColor(HslColor c) {
+        hslColorProperty().set(c);
     }
 }
