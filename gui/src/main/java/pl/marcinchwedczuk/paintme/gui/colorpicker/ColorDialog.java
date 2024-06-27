@@ -3,7 +3,15 @@ package pl.marcinchwedczuk.paintme.gui.colorpicker;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.RowConstraints;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Modality;
@@ -63,10 +71,91 @@ public class ColorDialog implements Initializable {
     @FXML
     private NumberTextField blueTextField;
 
+    private ToggleGroup selectedColorToggleGroup = new ToggleGroup();
+
+    @FXML
+    private GridPane predefinedColors;
+
+    @FXML
+    private GridPane customColors;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         System.out.println("Dialog initialized");
 
+        initializeColorPickerBindings();
+
+        final int COLUMNS = 8;
+        final int PREDEF_ROWS = 6;
+        final int CUSTOM_ROWS = 2;
+
+        // Setup GridPanes
+        /*
+        for (int c = 0; c < COLUMNS; c++) {
+            predefinedColors.getColumnConstraints().add(new ColumnConstraints());
+            customColors.getColumnConstraints().add(new ColumnConstraints());
+        }
+        for (int r = 0; r < PREDEF_ROWS; r++) {
+            predefinedColors.getRowConstraints().add(new RowConstraints());
+        }
+        for (int r = 0; r < CUSTOM_ROWS; r++) {
+            customColors.getRowConstraints().add(new RowConstraints());
+        }*/
+
+        NodeArray<RadioButton> radioButtons = new NodeArray<>(PREDEF_ROWS + CUSTOM_ROWS, COLUMNS);
+
+        // Fill GridPanes
+        for (int r = 0; r < PREDEF_ROWS + CUSTOM_ROWS; r++) {
+            for (int c = 0; c < COLUMNS; c++) {
+                var radio = new RadioButton();
+                radio.setToggleGroup(selectedColorToggleGroup);
+                radioButtons.setNode(radio, r, c);
+
+                if (r < PREDEF_ROWS) {
+                    predefinedColors.add(radio, c, r);
+                } else {
+                    customColors.add(radio, c, r - PREDEF_ROWS);
+                }
+            }
+        }
+
+        for(RadioButton button : radioButtons) {
+            // Be default radio that get focus will be selected, we want to split
+            // this behaviour into two: focusing and selecting (using Space).
+            button.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
+                RadioButton radioToFocus = null;
+
+                if (e.getCode() == KeyCode.DOWN) {
+                    e.consume();
+                    radioToFocus = radioButtons.getNodeBelow(button);
+                } else if (e.getCode() == KeyCode.UP) {
+                    e.consume();
+                    radioToFocus = radioButtons.getNodeAbove(button);
+                } else if (e.getCode() == KeyCode.LEFT) {
+                    e.consume();
+                    radioToFocus = radioButtons.getNodeOnLeft(button);
+                } else if (e.getCode() == KeyCode.RIGHT) {
+                    e.consume();
+                    radioToFocus = radioButtons.getNodeOnRight(button);
+                }
+
+                if (radioToFocus != null) radioToFocus.requestFocus();
+            });
+        }
+    }
+
+    public static RadioButton radioByCoords(final int row, final int column, GridPane gridPane) {
+        for (Node node : gridPane.getChildren()) {
+            if (GridPane.getRowIndex(node) != null && GridPane.getRowIndex(node) == row &&
+                    GridPane.getColumnIndex(node) != null && GridPane.getColumnIndex(node) == column) {
+                return (RadioButton)node;
+            }
+        }
+        return null;
+    }
+
+
+    private void initializeColorPickerBindings() {
         selectedColorPreview.fillProperty().bind(colorPicker.colorProperty());
 
         hueTextField.setMin(HslColor.MIN_HUE);

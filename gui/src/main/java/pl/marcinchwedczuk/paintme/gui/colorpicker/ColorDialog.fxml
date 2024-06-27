@@ -17,28 +17,15 @@
       prefHeight="400.0" prefWidth="600.0"
       stylesheets="@ColorDialog.css">
     <!-- Color Boxes -->
-    <VBox>
+    <VBox minWidth="300">
         <fx:define>
             <ToggleGroup fx:id="colorToggleGroup" />
         </fx:define>
         <Label mnemonicParsing="true">_Basic colors:</Label>
-        <TilePane fx:id="predefinedColors" styleClass="color-radio-container">
-            <RadioButton />
-            <RadioButton />
-            <RadioButton />
-            <RadioButton />
-            <RadioButton />
-            <RadioButton />
-        </TilePane>
+        <GridPane fx:id="predefinedColors" styleClass="color-radio-container" />
 
         <Label mnemonicParsing="true">_Custom colors:</Label>
-        <TilePane fx:id="customColors" styleClass="color-radio-container">
-            <RadioButton />
-            <RadioButton />
-            <RadioButton />
-            <RadioButton />
-            <RadioButton />
-        </TilePane>
+        <GridPane fx:id="customColors" styleClass="color-radio-container" />
 
         <Button VBox.vgrow="ALWAYS">_Define Custom Colors &gt;&gt;</Button>
         <HBox>
