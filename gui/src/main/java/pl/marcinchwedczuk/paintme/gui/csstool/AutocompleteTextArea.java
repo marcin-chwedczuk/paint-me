@@ -29,6 +29,8 @@ public class AutocompleteTextArea extends TextArea {
         autocompletePopup.getContent().add(autocompleteListView);
         autocompletePopup.setHideOnEscape(true);
 
+        replaceTabWithSpaces();
+
         // Show popup when a Control+Space is pressed
         addEventFilter(KeyEvent.KEY_RELEASED, event -> {
             if (event.getCode() == KeyCode.SPACE && event.isControlDown()) {
@@ -102,6 +104,22 @@ public class AutocompleteTextArea extends TextArea {
                 }
             }
         });
+    }
+
+    private void replaceTabWithSpaces() {
+        String spaces = " ".repeat(4);
+
+        setTextFormatter(new TextFormatter<>(change -> {
+            if (!change.isContentChange()) return change;
+
+            if ("\t".equals(change.getText())) {
+                change.setText(spaces);
+                change.setAnchor(change.getAnchor() + spaces.length() - 1);
+                change.setCaretPosition(change.getCaretPosition() + spaces.length() - 1);
+            }
+
+            return change;
+        }));
     }
 
     private void showAutocompletePopupAtCaret(boolean firstTime) {

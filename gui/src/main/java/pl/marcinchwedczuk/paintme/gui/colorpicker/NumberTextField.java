@@ -39,6 +39,11 @@ public class NumberTextField extends TextField {
                 if (i < getMin() || i > getMax()) {
                     return null;
                 }
+
+                if (i != 0 && proposedText.startsWith("0")) {
+                    // prevent e.g. '0003'
+                    return null;
+                }
             } catch (NumberFormatException e) {
                 return null;
             }
