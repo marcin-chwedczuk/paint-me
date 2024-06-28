@@ -1,9 +1,12 @@
-    .color-radio-container > .radio-button > .radio {
+.color-radio-container > .radio-button > .radio {
     -fx-background-radius: 0;
     -fx-background-color: yellow; // change color here
 
     -fx-border-color: gray white white gray, black darkgray darkgray black;
     -fx-border-insets:  0, 1;
+
+    -fx-pref-width: 30px;
+    -fx-pref-height: 24px;
 }
 
 .color-radio-container > .radio-button:focused > .radio {
@@ -23,5 +26,23 @@
 
 .color-radio-container {
     -fx-background-color: white;
+    -fx-hgap: 4px;
+    -fx-vgap: 4px;
+    -fx-padding: 8px 16px 8px 16px;
+}
 
+.color-picker {
+    -fx-spacing: 16px;
+}
+
+.color-picker .hue-saturation-area {
+    -fx-border-color: black white red yellow;
+    -fx-padding: 3px;
+    -fx-border-width: 3px;
+}
+
+.color-picker .luminance-area {
+    -fx-border-color: black white red yellow;
+    -fx-padding: 5px;
+    -fx-border-width: 3px;
 }

@@ -14,10 +14,9 @@
 <HBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="pl.marcinchwedczuk.paintme.gui.colorpicker.ColorDialog"
-      prefHeight="400.0" prefWidth="600.0"
-      stylesheets="@ColorDialog.css">
+      stylesheets="@ColorDialog.css" styleClass="color-dialog">
     <!-- Color Boxes -->
-    <VBox minWidth="300">
+    <VBox styleClass="predefined-colors">
         <fx:define>
             <ToggleGroup fx:id="colorToggleGroup" />
         </fx:define>
@@ -35,10 +34,10 @@
     </VBox>
 
     <!-- Expandable Color Picker -->
-    <VBox>
+    <VBox styleClass="custom-colors">
         <ColorPicker fx:id="colorPicker" />
 
-        <GridPane>
+        <GridPane styleClass="grid-layout">
             <columnConstraints>
                 <ColumnConstraints />
                 <ColumnConstraints />
@@ -52,27 +51,27 @@
                 <RowConstraints />
             </rowConstraints>
 
-            <VBox GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.rowSpan="3">
-                <Rectangle fx:id="selectedColorPreview" width="100" height="80" fill="aqua" />
+            <VBox GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.rowSpan="3" styleClass="color-preview-container">
+                <Region fx:id="selectedColorPreview" styleClass="color-preview" />
                 <Label mnemonicParsing="true">Color|S_olid</Label>
             </VBox>
 
-            <Label GridPane.rowIndex="0" GridPane.columnIndex="1" mnemonicParsing="true">Hu_e</Label>
+            <Label GridPane.rowIndex="0" GridPane.columnIndex="1" mnemonicParsing="true" labelFor="${hueTextField}">Hu_e:</Label>
             <NumberTextField GridPane.rowIndex="0" GridPane.columnIndex="2" fx:id="hueTextField" />
 
-            <Label GridPane.rowIndex="0" GridPane.columnIndex="3" mnemonicParsing="true">_Red</Label>
+            <Label GridPane.rowIndex="0" GridPane.columnIndex="3" mnemonicParsing="true">_Red:</Label>
             <NumberTextField GridPane.rowIndex="0" GridPane.columnIndex="4" fx:id="redTextField" />
 
-            <Label GridPane.rowIndex="1" GridPane.columnIndex="1" mnemonicParsing="true">_Sat</Label>
+            <Label GridPane.rowIndex="1" GridPane.columnIndex="1" mnemonicParsing="true">_Sat:</Label>
             <NumberTextField GridPane.rowIndex="1" GridPane.columnIndex="2" fx:id="satTextField" />
 
-            <Label GridPane.rowIndex="1" GridPane.columnIndex="3" mnemonicParsing="true">_Green</Label>
+            <Label GridPane.rowIndex="1" GridPane.columnIndex="3" mnemonicParsing="true">_Green:</Label>
             <NumberTextField GridPane.rowIndex="1" GridPane.columnIndex="4" fx:id="greenTextField" />
 
-            <Label GridPane.rowIndex="2" GridPane.columnIndex="1" mnemonicParsing="true">_Lum</Label>
+            <Label GridPane.rowIndex="2" GridPane.columnIndex="1" mnemonicParsing="true">_Lum:</Label>
             <NumberTextField GridPane.rowIndex="2" GridPane.columnIndex="2" fx:id="lumTextField" />
 
-            <Label GridPane.rowIndex="2" GridPane.columnIndex="3" mnemonicParsing="true">Bl_ue</Label>
+            <Label GridPane.rowIndex="2" GridPane.columnIndex="3" mnemonicParsing="true">Bl_ue:</Label>
             <NumberTextField GridPane.rowIndex="2" GridPane.columnIndex="4" fx:id="blueTextField" />
         </GridPane>
 

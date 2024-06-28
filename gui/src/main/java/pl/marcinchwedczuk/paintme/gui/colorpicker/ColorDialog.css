@@ -4,6 +4,9 @@
 
     -fx-border-color: gray white white gray, black darkgray darkgray black;
     -fx-border-insets:  0, 1;
+
+    -fx-pref-width: 30px;
+    -fx-pref-height: 24px;
 }
 
 .color-radio-container > .radio-button:focused > .radio {
@@ -22,5 +25,59 @@
 }
 
 .color-radio-container {
-    -fx-background-color: white;
+    -fx-hgap: 4px;
+    -fx-vgap: 4px;
+    -fx-padding: 8px;
+}
+
+.color-picker {
+    -fx-spacing: 0px;
+}
+
+.color-picker .hue-saturation-area {
+    -fx-border-color: black white white black;
+    -fx-border-width: 1px;
+}
+
+.color-picker .luminance-area {
+    -fx-border-insets: 0, 0 0 0 16px;
+    -fx-border-color: transparent, black white white black;
+    -fx-border-width: 1px;
+}
+
+.color-dialog {
+    -fx-padding: 8px;
+}
+
+.color-dialog .button {
+    -fx-background-radius: 0;
+}
+
+.color-preview {
+    -fx-width: 20px;
+    -fx-height: 20px;
+}
+
+.custom-colors .text-field {
+    -fx-pref-width: 3em;
+}
+
+.custom-colors .button {
+    -fx-max-width: Infinity;
+}
+
+.custom-colors .grid-layout {
+    -fx-hgap: 7px;
+    -fx-vgap: 2px;
+    -fx-padding: 10px 0 4px 0;
+}
+
+.color-preview-container {
+     -fx-alignment: center;
+    -fx-spacing: 0.2em;
+}
+
+.custom-colors .color-preview {
+    -fx-pref-width: 8em;
+    -fx-pref-height: 5em;
 }

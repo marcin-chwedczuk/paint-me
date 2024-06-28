@@ -5,8 +5,10 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.event.EventHandler;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
@@ -46,7 +48,7 @@ public class ColorPicker extends HBox {
         hueSaturationArea.setWidth(239);
         hueSaturationArea.setHeight(240);
 
-        var hueSaturationAreaPane = new Pane(hueSaturationArea);
+        var hueSaturationAreaPane = new HBox(hueSaturationArea);
         hueSaturationAreaPane.getStyleClass().add("hue-saturation-area");
 
         luminanceBar = new Canvas();
@@ -60,10 +62,13 @@ public class ColorPicker extends HBox {
         moveY.yProperty().bind(colorProperty.map(HslColor::ofColor).map(c -> 240 - c.luminosity()));
         triangleLuminancePointer.getTransforms().addAll(moveY, new Scale(8, 8));
 
-        var luminanceBarAreaPane = new HBox(luminanceBar, triangleLuminancePointer);
+        var luminanceBarAreaPane = new HBox(luminanceBar);
         luminanceBarAreaPane.getStyleClass().add("luminance-area");
 
-        getChildren().addAll(hueSaturationAreaPane, luminanceBarAreaPane);
+        var luminanceMarkerAreaPane = new HBox(triangleLuminancePointer);
+        luminanceMarkerAreaPane.getStyleClass().add("luminance-marker");
+
+        getChildren().addAll(hueSaturationAreaPane, luminanceBarAreaPane, luminanceMarkerAreaPane);
 
         hueSaturationArea.setOnMouseClicked(e -> {
             int x = (int) e.getX();
@@ -75,13 +80,13 @@ public class ColorPicker extends HBox {
             setHslColor(getHslColor().withHue(hue).withSaturation(saturation));
         });
 
-        luminanceBarAreaPane.setOnMouseClicked(e -> {
+        EventHandler<? super MouseEvent> luminanceBarOnClick = e -> {
             int y = (int) e.getY();
-
             int luminance = Math.clamp(240 - y, HslColor.MIN_LUMINOSITY, HslColor.MAX_LUMINOSITY);
-
             setHslColor(getHslColor().withLuminosity(luminance));
-        });
+        };
+        luminanceBarAreaPane.setOnMouseClicked(luminanceBarOnClick);
+        luminanceMarkerAreaPane.setOnMouseClicked(luminanceBarOnClick);
 
         hslColorProperty().addListener((e) -> {
             redrawPickerAreas();

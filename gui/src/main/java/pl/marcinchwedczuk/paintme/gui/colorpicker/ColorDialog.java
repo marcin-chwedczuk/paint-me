@@ -8,7 +8,9 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Background;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Modality;
@@ -45,7 +47,7 @@ public class ColorDialog implements Initializable {
     }
 
     @FXML
-    private Rectangle selectedColorPreview;
+    private Region selectedColorPreview;
 
     @FXML
     private ColorPicker colorPicker;
@@ -131,7 +133,7 @@ public class ColorDialog implements Initializable {
     }
 
     private void initializeColorPickerBindings() {
-        selectedColorPreview.fillProperty().bind(colorPicker.colorProperty());
+        selectedColorPreview.backgroundProperty().bind(colorPicker.colorProperty().map(Background::fill));
 
         hueTextField.setMin(HslColor.MIN_HUE);
         hueTextField.setMax(HslColor.MAX_HUE);
