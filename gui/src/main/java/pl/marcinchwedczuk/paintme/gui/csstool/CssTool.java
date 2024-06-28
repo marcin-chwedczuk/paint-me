@@ -27,6 +27,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.nio.file.StandardOpenOption.*;
 
@@ -88,7 +89,11 @@ public class CssTool implements Initializable {
 
         List<String> controlClassNames = JavaFxControlClassesFinder.findControlClasses().stream()
                 .map(Class::getName)
-                .toList();
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        // Extra "fake" control to load custom FXML forms into the tool
+        controlClassNames.add(FakeControl.class.getName());
+
         selectedControl.setItems(FXCollections.observableArrayList(controlClassNames));
 
         cssText.addEventHandler(KeyEvent.KEY_PRESSED, e -> {

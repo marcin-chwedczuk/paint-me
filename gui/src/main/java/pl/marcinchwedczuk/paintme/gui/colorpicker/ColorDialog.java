@@ -3,15 +3,12 @@ package pl.marcinchwedczuk.paintme.gui.colorpicker;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.RowConstraints;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Modality;
@@ -90,17 +87,6 @@ public class ColorDialog implements Initializable {
         final int CUSTOM_ROWS = 2;
 
         // Setup GridPanes
-        /*
-        for (int c = 0; c < COLUMNS; c++) {
-            predefinedColors.getColumnConstraints().add(new ColumnConstraints());
-            customColors.getColumnConstraints().add(new ColumnConstraints());
-        }
-        for (int r = 0; r < PREDEF_ROWS; r++) {
-            predefinedColors.getRowConstraints().add(new RowConstraints());
-        }
-        for (int r = 0; r < CUSTOM_ROWS; r++) {
-            customColors.getRowConstraints().add(new RowConstraints());
-        }*/
 
         NodeArray<RadioButton> radioButtons = new NodeArray<>(PREDEF_ROWS + CUSTOM_ROWS, COLUMNS);
 
@@ -143,17 +129,6 @@ public class ColorDialog implements Initializable {
             });
         }
     }
-
-    public static RadioButton radioByCoords(final int row, final int column, GridPane gridPane) {
-        for (Node node : gridPane.getChildren()) {
-            if (GridPane.getRowIndex(node) != null && GridPane.getRowIndex(node) == row &&
-                    GridPane.getColumnIndex(node) != null && GridPane.getColumnIndex(node) == column) {
-                return (RadioButton)node;
-            }
-        }
-        return null;
-    }
-
 
     private void initializeColorPickerBindings() {
         selectedColorPreview.fillProperty().bind(colorPicker.colorProperty());
